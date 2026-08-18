@@ -1,21 +1,21 @@
 <p align="center">
-  <img src="public/apple-touch-icon.png" width="72" alt="ALDARA" />
+  <img src="public/apple-touch-icon.png" width="88" alt="ALDARA" />
 </p>
 
 <h1 align="center">ALDARA</h1>
-<p align="center"><em>Bisutería artesanal que une culturas — Puerto Almenara</em></p>
+<p align="center"><strong>Bisutería artesanal que une culturas — Puerto Almenara</strong></p>
 
 ---
 
-ALDARA es una marca de bisutería inventada para este proyecto: piezas hechas a mano, inspiradas en la unión entre Venezuela y Colombia, con un taller ficticio en Puerto Almenara, España. Catálogo, precios, historia de marca y datos de contacto son de ejemplo — pensados para sostenerse como una tienda real de principio a fin, no como una maqueta estática de una sola pantalla.
+ALDARA es una marca de bisutería inventada para este proyecto: piezas hechas a mano, inspiradas en la unión entre Venezuela y Colombia, con un taller ficticio en Puerto Almenara, España. Todo el catálogo, los precios, la historia de marca y los datos de contacto son de ejemplo — pensados para sostenerse como una tienda real de principio a fin, no como una maqueta estática.
 
-Este repositorio es privado. Este README explica **qué es** el proyecto y **cómo está construido**, no cómo desplegarlo.
+Este repositorio es privado. Este README explica qué es el proyecto y cómo está construido, no cómo desplegarlo.
 
-## Qué es esto realmente
+## La tienda
 
-Una tienda de bisutería completa en Next.js: catálogo con filtros reales, carrito, favoritos, checkout de demostración, cuentas de usuario con sesión real, colecciones, lookbook shoppable, journal editorial, buscador de regalos, personalización en vivo, Charm Studio, Style Lab, Club de fidelidad, Joyero Digital, Pasaporte de pieza, tarjetas regalo, historias de regalo privadas, y decenas de páginas de soporte (materiales, cuidados, reparaciones, devoluciones, FAQ, legal...).
+Un e-commerce de bisutería completo, no un prototipo de una pantalla: catálogo navegable con filtros y buscador reales, carrito y favoritos persistentes, checkout de demostración, cuentas con sesión real, colecciones curadas, lookbook shoppable, journal editorial, buscador de regalos, personalización en vivo, Charm Studio, Style Lab, Club de fidelidad, Joyero Digital, Pasaporte de pieza, tarjetas regalo, historias de regalo privadas, y todo el soporte que espera una clienta real: materiales, cuidados, reparaciones, devoluciones, FAQ, legal.
 
-**~95 experiencias reales navegables**, todas verificadas contra un build de producción real — no solo en modo desarrollo, y no solo "se ve bien en una captura".
+**~95 experiencias reales navegables**, todas verificadas contra un build de producción — no una demo que solo funciona en una captura de pantalla.
 
 ## Qué es real y qué es demo
 
@@ -23,15 +23,13 @@ Una tienda de bisutería completa en Next.js: catálogo con filtros reales, carr
 |---|---|
 | Catálogo, filtros, buscador, orden | ✅ Real |
 | Carrito y favoritos (persistentes) | ✅ Real, guardado en el navegador |
-| Cuentas de usuario (registro/login) | ✅ Real y local: hash `scrypt`, sesión firmada HMAC-SHA256. No es un sistema de autenticación de producción (sin verificación de email, sin límite de intentos). |
-| Pedidos / checkout | ✅ El pedido se registra de verdad. ❌ No hay pasarela de pago real — no se cobra nada. |
-| Formularios (contacto, reparaciones, citas, RSVP...) | ✅ Reales: validan y persisten. ❌ No envían email todavía. |
-| Recuperar contraseña | ✅ Flujo real de un solo uso, token con expiración, sin revelar si un email existe. |
-| Concierge (chat) | ✅ Real, pero local: motor de reglas propio, sin LLM externo. |
-| Try-On / Visor 360° | ✅ Nivel real alcanzable sin AR de verdad (overlay 2D), documentado como tal. |
-| Fotografía de producto | 🟡 Parcial: `PhotoSlot` sustituye automáticamente cualquier composición generativa por una foto real en cuanto existe el archivo, sin tocar código. Buena parte del sitio ya tiene foto real; el resto sigue en composición vectorial mientras no haya más material. |
-| Pagos, envío de emails | ❌ No conectados — arquitectura lista para enchufarlos. |
-| SEO | ✅ Metadata por página, sitemap/robots dinámicos, JSON-LD (`Organization`, `Product`, `FAQPage`, `Article`), Open Graph/Twitter cards. |
+| Cuentas de usuario (registro/login) | ✅ Real y local: hash `scrypt`, sesión firmada HMAC-SHA256 |
+| Pedidos / checkout | ✅ El pedido se registra de verdad. ❌ Sin pasarela de pago real todavía |
+| Formularios (contacto, reparaciones, citas...) | ✅ Reales: validan y persisten. ❌ Sin envío de email todavía |
+| Recuperar contraseña | ✅ Flujo real de un solo uso, con token de expiración |
+| Concierge (chat) | ✅ Real, motor de reglas propio sobre el catálogo real |
+| Fotografía de producto | 🟡 Se activa automáticamente en cuanto existe el archivo — buena parte del catálogo ya tiene foto real |
+| SEO | ✅ Metadata por página, sitemap/robots dinámicos, JSON-LD, Open Graph |
 
 ## Stack
 
@@ -57,17 +55,15 @@ e2e/            # tests Playwright de los flujos críticos
 
 ## Cómo funciona la fotografía real
 
-`src/components/PhotoSlot.tsx` es el único mecanismo del sitio para sustituir una composición generativa por una foto real sin tocar código: si existe `public/photos/<nombre>.webp` con el nombre exacto que cada componente espera, se muestra automáticamente; si no existe, se ve exactamente igual que antes (nunca una imagen rota). Fotografía incremental, página a página, sin coordinar despliegues.
+`src/components/PhotoSlot.tsx` sustituye cualquier composición generativa por una foto real en cuanto existe `public/photos/<nombre>.webp` con el nombre exacto — sin tocar código ni layout. Fotografía incremental, página a página, sin coordinar despliegues.
 
-## Decisiones técnicas relevantes
+## Próximos pasos
 
-- **`useSyncExternalStore`, no `useEffect` + `setState`**, para sincronizar carrito/favoritos/tema con `localStorage`.
-- **Sin pasarela de pago real de entrada**: el checkout nunca pide número de tarjeta.
-- **Honestidad como principio de diseño**: ninguna función se presenta como más real de lo que es. Donde no hay dato real, la página lo dice en vez de inventarlo.
-- **i18n real** (ES/EN/FR) en todo el chrome de interfaz con mockup propio.
-
-## Qué queda pendiente, con intención
-
-- Pasarela de pago y envío de emails transaccionales reales.
+- Pasarela de pago real (Stripe) y envío de emails transaccionales — arquitectura ya preparada para conectarlos.
+- Conexión de WhatsApp Business real.
 - Fotografía y vídeo de producto real para el resto del catálogo.
 - Base de datos real (`data/*.json` es solo la capa de desarrollo).
+
+---
+
+<sub>Contributors: [alvaroferrer1](https://github.com/alvaroferrer1)</sub>

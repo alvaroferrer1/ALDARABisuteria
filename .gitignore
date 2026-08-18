@@ -47,3 +47,23 @@ next-env.d.ts
 
 # material de referencia (PDFs/ZIP grandes, no versionar)
 /spec/
+
+# notas internas de trabajo (auditorias/checklists de sesion, no son el
+# proyecto en si) y config local del CLI
+/.claude/
+/95_EXPERIENCE_FINAL_MATRIX.md
+/ART_DIRECTION.md
+/ASSET_REGISTRY.md
+/DECISIONS.md
+/DESIGN_RESEARCH_2026.md
+/FREEZE_MANIFEST.md
+/KNOWN_ISSUES.md
+/MASTER_CHECKLIST.md
+/MOTION_LANGUAGE.md
+/PDF_COMPLIANCE_MATRIX.md
+/PHOTO_ASSET_MANIFEST.md
+/POST_AUDIT_IMPROVEMENTS.md
+/PROJECT_STATE.md
+/SITEMAP_FINAL.md
+/VISUAL_REFERENCE_INDEX.md
+/WORK_LOG.md
