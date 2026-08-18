@@ -61,11 +61,33 @@ export const metadata: Metadata = {
 // un refresco de página.
 const THEME_INIT_SCRIPT = `(function(){try{var raw=localStorage.getItem('aldara_theme');var s=raw?JSON.parse(raw):null;if(s==='dark'||(!s&&matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.setAttribute('data-theme','dark');}catch(e){}})();`;
 
+// JSON-LD Organization global — antes solo existía el schema Product en PDP,
+// ninguna página declaraba quién es ALDARA como entidad (nombre, logo, redes
+// reales, dirección). Es el schema de mayor impacto SEO por menor esfuerzo:
+// cubre a la vez el conocimiento de marca en buscadores y el sameAs con
+// Instagram real.
+const ORGANIZATION_JSON_LD = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "ALDARA",
+  url: "https://www.aldara.store",
+  logo: "https://www.aldara.store/apple-touch-icon.png",
+  description: "Bisutería artesanal hecha a mano en Puerto Almenara que fusiona la tradición de Venezuela y Colombia.",
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: "Calle del Almendro 12",
+    addressLocality: "Puerto Almenara",
+    addressCountry: "ES",
+  },
+  sameAs: ["https://www.instagram.com/aldara.bisuteria"],
+};
+
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="es" className={`${cormorant.variable} ${montserrat.variable}`} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ORGANIZATION_JSON_LD) }} />
       </head>
       <body className="flex min-h-screen flex-col antialiased">
         <a href="#main" className="skip-link">
