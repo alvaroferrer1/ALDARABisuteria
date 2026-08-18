@@ -1,26 +1,191 @@
 @import "tailwindcss";
 
+/* =========================================================
+   ALDARA — sistema de diseño (paleta compartida con la web
+   estática: marfil cálido, tinta carbón, oro, terracota, azul)
+   ========================================================= */
+/* Paleta EXACTA de ALDARA_Propuesta_Cliente_FINAL_v2.pdf, Bloque 0 ·
+   "Paleta y sistema". Light y dark son dos paletas reales con hex propio
+   (Azul Profundo / Carbón / Pizarra), no una simple inversión del claro. */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --ivory: #faf6f0; /* Marfil */
+  --surface: #ffffff;
+  --surface-2: #f0e6d8; /* Arena */
+  --surface-3: #e7d6c1; /* Beige suave */
+  --ink: #1a1a1d; /* Carbón */
+  --ink-soft: #5c564e;
+  --gold: #d4af37; /* Oro ALDARA */
+  --gold-light: #e3c665;
+  --terracotta: #b87333; /* Bronce cálido */
+  --blue: #223a5e;
+  --line: rgba(26, 26, 29, 0.12);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+:root[data-theme="dark"] {
+  --ivory: #0d1220; /* Azul profundo */
+  --surface: #181b23; /* Carbón (dark) */
+  --surface-2: #2a2e37; /* Pizarra */
+  --surface-3: #333947;
+  --ink: #f2eee4; /* Marfil cálido */
+  --ink-soft: #c3bdb0;
+  --gold: #d4af37;
+  --gold-light: #e3c665;
+  --terracotta: #cb8a4d;
+  --blue: #7c9bc7;
+  --line: rgba(242, 238, 228, 0.14);
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  :root:not([data-theme="light"]) {
+    --ivory: #0d1220;
+    --surface: #181b23;
+    --surface-2: #2a2e37;
+    --surface-3: #333947;
+    --ink: #f2eee4;
+    --ink-soft: #c3bdb0;
+    --gold: #d4af37;
+    --gold-light: #e3c665;
+    --terracotta: #cb8a4d;
+    --blue: #7c9bc7;
+    --line: rgba(242, 238, 228, 0.14);
   }
 }
 
+@theme inline {
+  --color-ivory: var(--ivory);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-gold: var(--gold);
+  --color-gold-light: var(--gold-light);
+  --color-terracotta: var(--terracotta);
+  --color-blue: var(--blue);
+  --color-line: var(--line);
+  --font-display: var(--font-cormorant);
+  --font-sans: var(--font-montserrat);
+}
+
+/* Movimiento ambiental sutil para la escena cinematográfica de Home
+   (halo de luz tras la pieza hero). Gated por motion-safe: en Tailwind. */
+@keyframes aldara-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-14px);
+  }
+}
+@keyframes aldara-drift {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+  50% {
+    transform: rotate(4deg) scale(1.05);
+  }
+  100% {
+    transform: rotate(0deg) scale(1);
+  }
+}
+
+/* Transición de página estable (Bloque 9, ref. 9.6) — sin View Transitions
+   API: React 19.2.8 (la versión instalada) no la exporta bajo ningún
+   nombre, confirmado con una build real fallida antes de esta decisión.
+   En vez de bloquear la función a una versión inestable de React, se usa
+   una técnica CSS estándar: `key={pathname}` remonta el contenido en cada
+   navegación y esta animación de entrada se dispara sola. Respeta
+   `prefers-reduced-motion` vía la regla global de abajo. */
+@keyframes page-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.page-transition {
+  animation: page-fade-in 380ms ease-out;
+}
+
+@keyframes announcement-slide {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Guarda global contra overflow horizontal real pero invisible: los SVG
+   generativos (ProductPlate/DemoPhoto/CollectionCover/JournalPlate...) usan
+   `filter` (blur) sobre formas rotadas — Chromium calcula la región de
+   filtro (por defecto ~10-20% más grande que la geometría) como parte del
+   "scrollable overflow" del documento aunque el propio <svg> la recorte
+   visualmente (overflow:hidden por defecto en el elemento raíz). Resultado
+   real detectado con un barrido automatizado: el usuario podía deslizar
+   unos px hacia la derecha y ver un borde de fondo vacío, sin que hubiera
+   nada roto visualmente que corregir en cada componente uno a uno — la
+   causa es un cálculo de layout del navegador, no contenido desbordado de
+   verdad. Ningún contenido real necesita scroll horizontal a nivel de
+   página (las tablas/carriles que sí lo necesitan ya usan su propio
+   `overflow-x-auto` en un contenedor interno, no en <body>/<html>). */
+html {
+  overflow-x: hidden;
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--ivory);
+  color: var(--ink);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  overflow-x: hidden;
+}
+
+/* Tracking editorial de titulares — Bloque 04 del PDF de propuesta
+   (Cormorant Garamond SemiBold, tracking positivo en todos los tamaños). */
+.font-display {
+  font-family: var(--font-display), serif;
+  letter-spacing: 0.01em;
+  font-weight: 600;
+}
+
+.skip-link {
+  position: absolute;
+  left: -999px;
+  top: 0;
+  background: var(--ink);
+  color: var(--ivory);
+  padding: 10px 16px;
+  z-index: 999;
+}
+.skip-link:focus {
+  left: 16px;
+  top: 16px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
