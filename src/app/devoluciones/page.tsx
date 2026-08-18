@@ -7,6 +7,7 @@ import { ReturnForm } from "@/components/ReturnForm";
 import { RETURN_STAGES, getSimulatedReturnStageIndex } from "@/lib/returnTracking";
 import type { DemoOrder } from "@/lib/types";
 import type { ReturnRequest } from "@/app/api/returns/route";
+import { PhotoSlot } from "@/components/PhotoSlot";
 
 export const metadata: Metadata = {
   title: "Devoluciones",
@@ -47,6 +48,9 @@ export default async function DevolucionesPage() {
 
   return (
     <section className="mx-auto max-w-xl px-4 py-20 sm:px-6">
+      <div className="relative mb-8 aspect-4/3 overflow-hidden rounded-3xl">
+        <PhotoSlot name="devoluciones-hero" alt="" fallback={<div className="absolute inset-0 bg-surface-2" />} />
+      </div>
       <p className="mb-2 text-xs font-bold uppercase tracking-widest text-terracotta">Devoluciones</p>
       <h1 className="mb-2 font-display text-3xl font-semibold">Solicita una devolución</h1>
       <p className="mb-8 text-ink-soft">Tienes 14 días naturales desde la recepción, salvo piezas personalizadas (solo por defecto de fabricación).</p>

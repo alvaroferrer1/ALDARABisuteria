@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useTranslations } from "@/lib/i18n/localeStore";
 import { money } from "@/lib/storage";
+import { PhotoSlot } from "@/components/PhotoSlot";
 
 interface Tier {
   name: string;
@@ -47,6 +48,9 @@ export function ClubContent({
 
   return (
     <section className="mx-auto max-w-3xl px-4 py-16 sm:px-6">
+      <div className="relative mb-8 aspect-21/9 overflow-hidden rounded-3xl">
+        <PhotoSlot name="club-hero" alt="" fallback={<div className="absolute inset-0 bg-surface-2" />} />
+      </div>
       <p className="mb-3 text-xs font-bold uppercase tracking-widest text-terracotta">{m.clubEyebrow}</p>
       <h1 className="font-display text-4xl font-semibold sm:text-5xl">{m.clubTitle}</h1>
       <p className="mt-4 max-w-lg text-ink-soft">{m.clubSubtitle}</p>

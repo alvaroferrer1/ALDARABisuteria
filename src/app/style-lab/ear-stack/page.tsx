@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   description: "Combina hasta 3 pendientes reales del catálogo ALDARA y añade la combinación completa a tu cesta.",
 };
 
-const INSPIRATION = ["style-combinacion-2", "style-combinacion-3"];
+const INSPIRATION = ["style-combinacion-2", "style-combinacion-3", "category-necklaces-layering", "layering-collares"];
 
 export default function EarStackPage() {
   return (
