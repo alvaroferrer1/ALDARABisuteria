@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { GiftFinder } from "@/components/GiftFinder";
 import { RegalosHero, RegalosIdeasPrompt } from "@/components/RegalosHero";
+import { PhotoSlot } from "@/components/PhotoSlot";
 
 export const metadata: Metadata = {
   title: "Buscador de Regalos",
@@ -16,7 +17,7 @@ export default function RegalosPage() {
           en la auditoría visual, ref. 3.1). */}
       <section className="relative overflow-hidden">
         <div className="relative aspect-auto min-h-100 w-full sm:aspect-21/9 sm:min-h-0 lg:aspect-21/8">
-          <GiftFinderPhotoPlaceholder />
+          <PhotoSlot name="regalos-hero" alt="" fallback={<GiftFinderPhotoPlaceholder />} />
           <div
             className="absolute inset-0"
             style={{ background: "linear-gradient(100deg, rgba(20,12,8,0.62) 0%, rgba(20,12,8,0.32) 42%, rgba(20,12,8,0.04) 68%, rgba(20,12,8,0) 88%)" }}

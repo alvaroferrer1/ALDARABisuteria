@@ -133,8 +133,9 @@ export function Footer() {
           <p className="max-w-[240px] text-sm text-white/60">{t.footer.tagline}</p>
           <div className="mt-5 flex items-center gap-2" aria-label="Culturas ALDARA">
             <svg viewBox="0 0 3 2" width="22" role="img" aria-label="Colombia">
-              <rect width="3" height="2" fill="#0067C6" />
-              <rect width="3" height="0.666" y="0.666" fill="#fff" />
+              <rect width="3" height="1" fill="#FCD116" />
+              <rect width="3" height="0.5" y="1" fill="#003893" />
+              <rect width="3" height="0.5" y="1.5" fill="#CE1126" />
             </svg>
             <svg viewBox="0 0 3 2" width="22" role="img" aria-label="Venezuela">
               <rect width="3" height="2" fill="#00247D" />

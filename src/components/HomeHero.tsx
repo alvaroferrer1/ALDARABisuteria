@@ -43,8 +43,9 @@ export function HomeHero() {
           <Reveal className="max-w-lg">
             <p className="mb-5 flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#e3c665]">
               <svg viewBox="0 0 3 2" width="18" role="img" aria-label="Colombia">
-                <rect width="3" height="2" fill="#0067C6" />
-                <rect width="3" height="0.666" y="0.666" fill="#fff" />
+                <rect width="3" height="1" fill="#FCD116" />
+              <rect width="3" height="0.5" y="1" fill="#003893" />
+              <rect width="3" height="0.5" y="1.5" fill="#CE1126" />
               </svg>
               <svg viewBox="0 0 3 2" width="18" role="img" aria-label="Venezuela">
                 <rect width="3" height="2" fill="#00247D" />
@@ -105,8 +106,9 @@ export function HomeHero() {
               <rect width="3" height="0.666" y="1.333" fill="#CF142B" />
             </svg>
             <svg viewBox="0 0 3 2" width="20" role="img" aria-label="Colombia">
-              <rect width="3" height="2" fill="#0067C6" />
-              <rect width="3" height="0.666" y="0.666" fill="#fff" />
+              <rect width="3" height="1" fill="#FCD116" />
+              <rect width="3" height="0.5" y="1" fill="#003893" />
+              <rect width="3" height="0.5" y="1.5" fill="#CE1126" />
             </svg>
           </p>
           <p className="text-xs font-bold uppercase tracking-wide text-[#e3c665]">{t.home.floatingTitle}</p>

@@ -65,8 +65,9 @@ export function CinematicHero() {
           </svg>
           <span>+</span>
           <svg viewBox="0 0 3 2" width="20" role="img" aria-label="Colombia">
-            <rect width="3" height="2" fill="#0067C6" />
-            <rect width="3" height="0.666" y="0.666" fill="#fff" />
+            <rect width="3" height="1" fill="#FCD116" />
+              <rect width="3" height="0.5" y="1" fill="#003893" />
+              <rect width="3" height="0.5" y="1.5" fill="#CE1126" />
           </svg>
           <span>Hecho a mano en Puerto Almenara</span>
         </p>

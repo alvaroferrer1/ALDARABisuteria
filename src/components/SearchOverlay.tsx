@@ -6,6 +6,7 @@ import { useSearchOverlayOpen, closeSearch } from "@/lib/searchOverlayStore";
 import { searchSite } from "@/lib/searchIndex";
 import { useTranslations } from "@/lib/i18n/localeStore";
 import { searchHistoryStore, recordSearch, clearSearchHistory } from "@/lib/searchHistoryStore";
+import { PhotoSlot } from "@/components/PhotoSlot";
 
 const TYPE_COLOR: Record<string, string> = {
   producto: "var(--gold)",
@@ -127,7 +128,12 @@ function SearchOverlayPanel() {
               <p className="p-6 text-center text-sm text-ink-soft">{t.search.empty}</p>
             )
           ) : results.length === 0 ? (
-            <p className="p-6 text-center text-sm text-ink-soft">{t.search.noResults}</p>
+            <div className="p-6 text-center">
+              <div className="relative mx-auto mb-4 aspect-video max-w-56 overflow-hidden rounded-2xl">
+                <PhotoSlot name="busqueda-vacia" alt="" fallback={<div className="absolute inset-0 bg-surface-2" />} />
+              </div>
+              <p className="text-sm text-ink-soft">{t.search.noResults}</p>
+            </div>
           ) : (
             <ul>
               {results.map((r, i) => (
