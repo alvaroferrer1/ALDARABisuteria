@@ -9,6 +9,7 @@ El usuario tiene un límite de tokens de Claude que se agota rápido. En este pr
 - Antes de investigar un bug reportado a ciegas por texto ambiguo, pide una captura o confirma con una pregunta corta en vez de recorrer muchas páginas probando.
 - No re-audites páginas ya verificadas como correctas salvo que haya un cambio real en ellas.
 - Sé directo en las respuestas: resume en pocas líneas, sin repetir contexto ya conocido.
+- **No hacer `git push` sin permiso explícito del usuario en ese mismo turno.** Comitear en local sí, cuando el trabajo esté verificado — pero el `push` a GitHub solo cuando el usuario lo pida literalmente ("sube", "haz push"...).
 
 ## Hoja de ruta activa (si el usuario dice "sigue" sin más contexto, continúa por aquí, en este orden)
 
