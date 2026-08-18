@@ -11,17 +11,31 @@ ALDARA es una marca de bisutería inventada para este proyecto: piezas hechas a 
 
 Este repositorio es privado. Este README explica qué es el proyecto y cómo está construido, no cómo desplegarlo.
 
-## Una tienda, no una maqueta
+<br>
 
-ALDARA es la experiencia completa de una joyería online de gama alta: desde el primer vistazo al catálogo hasta el momento en que la pieza llega envuelta a casa.
+<img src="docs/screenshots/home.jpg" width="100%" alt="Home de ALDARA" />
 
-Cada colección tiene su propia historia. Cada pieza, su ficha con acabados, materiales y cómo combinarla. El Buscador de Regalos guía a quien no sabe qué elegir. El Charm Studio y el Style Lab dejan que cada clienta arme su propia combinación y la vea antes de comprarla. El Joyero Digital guarda las piezas de cada usuaria como una colección personal, con el Pasaporte de cada joya contando su origen. Las historias de regalo privadas convierten una compra en un mensaje que solo esa persona verá.
+<br><br>
 
-Y todo lo que rodea a la compra está pensado igual de a fondo: cuentas con sesión real, seguimiento de pedidos, reparaciones, devoluciones, un Club de fidelidad, tarjetas regalo — la parte que la mayoría de demos se salta.
+Cada colección tiene su fotografía y su historia propia. Cada pieza, su ficha con macro real, cómo se lleva y con qué combina.
+
+<img src="docs/screenshots/producto.jpg" width="100%" alt="Ficha de producto" />
+
+<br><br>
+
+El Style Lab deja que cada clienta arme su propia combinación pieza a pieza, con precio real, y la añada a la cesta de una vez.
+
+<img src="docs/screenshots/style-lab.jpg" width="100%" alt="Style Lab" />
+
+<br><br>
+
+## Todo lo que hay detrás de la compra
+
+No es solo un catálogo bonito. Buscador de Regalos, Charm Studio, Joyero Digital con el Pasaporte de cada pieza, Club de fidelidad, tarjetas regalo, historias de regalo privadas, cuentas con sesión real, seguimiento de pedidos, reparaciones, devoluciones — la parte que la mayoría de demos se salta.
 
 ## Diseño
 
-Paleta cálida (marfil, arena, dorado, terracota) inspirada en el oficio artesanal, con modo claro y oscuro cuidados por igual. Tipografía editorial (Cormorant Garamond) para los titulares, Montserrat para todo lo demás. Composición fotográfica real donde ya existe material, y una identidad visual generativa propia — nunca un placeholder roto — donde todavía no la hay.
+Paleta cálida (marfil, arena, dorado, terracota), modo claro y oscuro cuidados por igual, tipografía editorial (Cormorant Garamond + Montserrat). Composición fotográfica real donde ya existe material, e identidad visual generativa propia —nunca un hueco roto— donde todavía no la hay.
 
 ## Stack
 
