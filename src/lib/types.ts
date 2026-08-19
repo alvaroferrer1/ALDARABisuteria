@@ -30,6 +30,7 @@ export interface Address {
   province: string;
   country: string;
   phone: string;
+  isDefault?: boolean;
 }
 
 export interface GiftCard {

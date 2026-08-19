@@ -37,10 +37,38 @@ export async function POST(request: Request) {
   if (!isAddress(body)) return NextResponse.json({ error: "Dirección incompleta." }, { status: 400 });
 
   const addresses = await readJson<StoredAddress[]>(FILE, []);
-  const entry: StoredAddress = { id: randomUUID(), email: user.email, ...body };
+  // Primera dirección del usuario → predeterminada automáticamente, para
+  // que siempre haya una marcada sin pedirle un paso extra.
+  const hasDefault = addresses.some((a) => a.email.toLowerCase() === user.email.toLowerCase() && a.isDefault);
+  const entry: StoredAddress = { id: randomUUID(), email: user.email, ...body, isDefault: !hasDefault };
   addresses.push(entry);
   await writeJson(FILE, addresses);
   return NextResponse.json({ ok: true, address: entry });
+}
+
+export async function PATCH(request: Request) {
+  const user = await requireUser();
+  if (!user) return NextResponse.json({ error: "Inicia sesión." }, { status: 401 });
+
+  let body: unknown;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: "Cuerpo inválido." }, { status: 400 });
+  }
+  const id = typeof body === "object" && body !== null ? (body as Record<string, unknown>).id : undefined;
+  if (typeof id !== "string") return NextResponse.json({ error: "Falta el id." }, { status: 400 });
+
+  const addresses = await readJson<StoredAddress[]>(FILE, []);
+  let found = false;
+  const updated = addresses.map((a) => {
+    if (a.email.toLowerCase() !== user.email.toLowerCase()) return a;
+    if (a.id === id) found = true;
+    return { ...a, isDefault: a.id === id };
+  });
+  if (!found) return NextResponse.json({ error: "Dirección no encontrada." }, { status: 404 });
+  await writeJson(FILE, updated);
+  return NextResponse.json({ ok: true });
 }
 
 export async function DELETE(request: Request) {
@@ -51,7 +79,13 @@ export async function DELETE(request: Request) {
   if (!id) return NextResponse.json({ error: "Falta el id." }, { status: 400 });
 
   const addresses = await readJson<StoredAddress[]>(FILE, []);
-  const filtered = addresses.filter((a) => !(a.id === id && a.email.toLowerCase() === user.email.toLowerCase()));
+  const deletingDefault = addresses.some((a) => a.id === id && a.email.toLowerCase() === user.email.toLowerCase() && a.isDefault);
+  let filtered = addresses.filter((a) => !(a.id === id && a.email.toLowerCase() === user.email.toLowerCase()));
+  // Si se borra la predeterminada y quedan otras, la siguiente pasa a serlo — nunca se queda el usuario sin ninguna marcada habiendo direcciones.
+  if (deletingDefault) {
+    const nextIndex = filtered.findIndex((a) => a.email.toLowerCase() === user.email.toLowerCase());
+    if (nextIndex !== -1) filtered = filtered.map((a, i) => (i === nextIndex ? { ...a, isDefault: true } : a));
+  }
   await writeJson(FILE, filtered);
   return NextResponse.json({ ok: true });
 }

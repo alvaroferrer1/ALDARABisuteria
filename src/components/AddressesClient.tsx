@@ -60,12 +60,26 @@ export function AddressesClient({ initialAddresses }: { initialAddresses: Stored
     router.refresh();
   }
 
+  async function handleSetDefault(id: string) {
+    setAddresses((prev) => prev.map((a) => ({ ...a, isDefault: a.id === id })));
+    await fetch("/api/account/addresses", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id }) });
+    router.refresh();
+  }
+
   return (
     <div>
       <div className="flex flex-col gap-4">
         {addresses.map((a) => (
-          <div key={a.id} className="flex items-start justify-between gap-4 rounded-2xl border border-line p-5">
+          <div
+            key={a.id}
+            className={`flex items-start justify-between gap-4 rounded-2xl border p-5 ${a.isDefault ? "border-terracotta bg-terracotta/5" : "border-line"}`}
+          >
             <div className="text-sm">
+              {a.isDefault && (
+                <span className="mb-1.5 inline-block rounded-full bg-terracotta px-2.5 py-0.5 text-[0.65rem] font-bold uppercase tracking-wide text-white">
+                  {t.accountAddresses.defaultBadge}
+                </span>
+              )}
               <p className="font-semibold">{a.fullName}</p>
               <p className="text-ink-soft">{a.street}</p>
               <p className="text-ink-soft">
@@ -74,9 +88,16 @@ export function AddressesClient({ initialAddresses }: { initialAddresses: Stored
               <p className="text-ink-soft">{a.country}</p>
               <p className="mt-1 text-ink-soft">{a.phone}</p>
             </div>
-            <button type="button" onClick={() => handleDelete(a.id)} className="shrink-0 text-sm font-medium text-terracotta hover:underline">
-              {t.accountAddresses.delete}
-            </button>
+            <div className="flex shrink-0 flex-col items-end gap-2">
+              {!a.isDefault && (
+                <button type="button" onClick={() => handleSetDefault(a.id)} className="text-xs font-medium text-ink-soft hover:text-terracotta hover:underline">
+                  {t.accountAddresses.setDefault}
+                </button>
+              )}
+              <button type="button" onClick={() => handleDelete(a.id)} className="text-sm font-medium text-terracotta hover:underline">
+                {t.accountAddresses.delete}
+              </button>
+            </div>
           </div>
         ))}
         {addresses.length === 0 && !showForm && <p className="text-ink-soft">{t.accountAddresses.empty}</p>}

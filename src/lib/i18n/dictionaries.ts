@@ -617,6 +617,8 @@ export const dictionaries = {
       saving: "Guardando...",
       cancel: "Cancelar",
       addAddress: "+ Añadir dirección",
+      defaultBadge: "Predeterminada",
+      setDefault: "Marcar como predeterminada",
     },
     accountSecurity: {
       title: "Seguridad",
@@ -1368,6 +1370,8 @@ export const dictionaries = {
       saving: "Saving...",
       cancel: "Cancel",
       addAddress: "+ Add address",
+      defaultBadge: "Default",
+      setDefault: "Set as default",
     },
     accountSecurity: {
       title: "Security",
@@ -2119,6 +2123,8 @@ export const dictionaries = {
       saving: "Enregistrement...",
       cancel: "Annuler",
       addAddress: "+ Ajouter une adresse",
+      defaultBadge: "Par défaut",
+      setDefault: "Définir par défaut",
     },
     accountSecurity: {
       title: "Sécurité",
