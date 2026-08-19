@@ -19,5 +19,12 @@
     "reason": "Tengo una duda sobre una pieza",
     "message": "Mensaje de prueba E2E, ignorar.",
     "receivedAt": "2026-08-19T07:52:46.028Z"
+  },
+  {
+    "name": "E2E Contacto",
+    "email": "e2e-contact@example.com",
+    "reason": "Tengo una duda sobre una pieza",
+    "message": "Mensaje de prueba E2E, ignorar.",
+    "receivedAt": "2026-08-19T08:01:26.226Z"
   }
 ]

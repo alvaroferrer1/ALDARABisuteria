@@ -67,6 +67,12 @@ export function getPostBySlug(slug: string): JournalPost | undefined {
   return JOURNAL_POSTS.find((p) => p.slug === slug);
 }
 
+/** Cálculo trivial por recuento de palabras (~200 ppm), sin dependencias nuevas. */
+export function readingTimeMinutes(post: JournalPost): number {
+  const words = post.content.join(" ").trim().split(/\s+/).length;
+  return Math.max(1, Math.round(words / 200));
+}
+
 /** Acento por sección de la revista — usado en JournalPlate y en la portada. */
 export const JOURNAL_CATEGORY_COLORS: Record<string, string> = {
   Styling: "var(--blue)",

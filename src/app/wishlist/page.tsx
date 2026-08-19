@@ -2,18 +2,40 @@
 
 import Link from "next/link";
 import { useWishlist } from "@/context/WishlistContext";
+import { useCart } from "@/context/CartContext";
 import { PRODUCTS } from "@/lib/products";
 import { money } from "@/lib/storage";
 import { ProductCard } from "@/components/ProductCard";
 import { PhotoSlot } from "@/components/PhotoSlot";
 
 export default function WishlistPage() {
-  const { ids, snapshots } = useWishlist();
+  const { ids, snapshots, toggle } = useWishlist();
+  const { addItem } = useCart();
   const items = PRODUCTS.filter((p) => ids.includes(p.id));
+  const inStockCount = items.filter((p) => p.stock > 0).length;
+
+  // "Mover todo al carrito" (POST_AUDIT_IMPROVEMENTS.md, bloque O): respeta
+  // stock real — las piezas agotadas se omiten con aviso en vez de añadirlas
+  // igualmente, y solo se quitan de favoritos las que sí se han movido.
+  function moveAllToCart() {
+    for (const p of items) {
+      if (p.stock > 0) {
+        addItem(p.id, 1);
+        toggle(p.id);
+      }
+    }
+  }
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-      <h1 className="font-display text-3xl font-semibold sm:text-4xl">Tus favoritos</h1>
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <h1 className="font-display text-3xl font-semibold sm:text-4xl">Tus favoritos</h1>
+        {inStockCount > 0 && (
+          <button type="button" onClick={moveAllToCart} className="rounded-full bg-ink px-5 py-2.5 text-sm font-semibold text-ivory hover:-translate-y-0.5 transition-transform">
+            Mover {inStockCount === items.length ? "todo" : `${inStockCount}`} al carrito
+          </button>
+        )}
+      </div>
 
       {items.length === 0 ? (
         <div className="mt-10 overflow-hidden rounded-2xl bg-surface-2 text-center">

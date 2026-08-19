@@ -41,7 +41,16 @@ export function EdicionesLimitadasContent({ editions }: { editions: LimitedEditi
                   <p className="font-semibold group-hover:text-terracotta">{e.product.name}</p>
                   <p className="mt-1 text-sm text-ink-soft">{e.story}</p>
                   <p className="mt-2 text-sm font-semibold">{money(e.product.price)}</p>
-                  <p className="mt-1 text-xs text-ink-soft">{soldOut ? b.edicionesNoUnits : `${remaining} ${b.edicionesUnitsLeft}`}</p>
+
+                  {/* Barra de unidades reclamadas — honesta (no es una cuenta
+                      atrás falsa, es disponibilidad real ya calculada arriba). */}
+                  <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-line" role="progressbar" aria-valuenow={e.claimed} aria-valuemin={0} aria-valuemax={e.editionSize}>
+                    <div
+                      className={`h-full rounded-full transition-all duration-300 ${soldOut ? "bg-ink-soft" : "bg-terracotta"}`}
+                      style={{ width: `${Math.min(100, Math.round((e.claimed / e.editionSize) * 100))}%` }}
+                    />
+                  </div>
+                  <p className="mt-1.5 text-xs text-ink-soft">{soldOut ? b.edicionesNoUnits : `${remaining} ${b.edicionesUnitsLeft}`}</p>
                 </div>
               </Link>
             );

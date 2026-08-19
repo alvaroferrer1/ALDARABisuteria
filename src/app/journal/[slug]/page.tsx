@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { getAllPosts, getPostBySlug, JOURNAL_CATEGORY_COLORS } from "@/lib/journal";
+import { getAllPosts, getPostBySlug, JOURNAL_CATEGORY_COLORS, readingTimeMinutes } from "@/lib/journal";
 import { PRODUCTS } from "@/lib/products";
 import { ProductCard } from "@/components/ProductCard";
 import { JournalPlate } from "@/components/JournalPlate";
@@ -57,6 +57,8 @@ export default async function JournalPostPage({ params }: PageProps<"/journal/[s
           <h1 className="max-w-2xl font-display text-3xl font-semibold text-white sm:text-5xl">{post.title}</h1>
           <p className="mt-3 text-sm text-white/75">
             {new Date(post.publishedAt).toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric" })}
+            {" · "}
+            {readingTimeMinutes(post)} min de lectura
           </p>
         </div>
       </section>

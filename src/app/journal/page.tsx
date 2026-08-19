@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { getAllPosts, JOURNAL_CATEGORY_COLORS } from "@/lib/journal";
+import { getAllPosts, JOURNAL_CATEGORY_COLORS, readingTimeMinutes } from "@/lib/journal";
 import { JournalPlate } from "@/components/JournalPlate";
 import { Reveal } from "@/components/Reveal";
 import { JournalHero, JournalMoreStoriesHeading } from "@/components/JournalChrome";
@@ -41,6 +41,7 @@ export default function JournalIndexPage() {
                   {featured.title}
                 </h2>
                 <p className="mt-2 max-w-xl text-sm text-white/80 sm:text-base">{featured.excerpt}</p>
+                <p className="mt-2 text-xs text-white/60">{readingTimeMinutes(featured)} min de lectura</p>
               </div>
             </div>
           </Link>
@@ -64,6 +65,7 @@ export default function JournalIndexPage() {
                 </div>
                 <h3 className="mt-3 font-display text-lg font-semibold group-hover:text-terracotta">{post.title}</h3>
                 <p className="mt-1 text-sm text-ink-soft">{post.excerpt}</p>
+                <p className="mt-1.5 text-xs text-ink-soft">{readingTimeMinutes(post)} min de lectura</p>
               </Link>
             </Reveal>
           ))}
