@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getAllPosts, getPostBySlug, JOURNAL_CATEGORY_COLORS, readingTimeMinutes } from "@/lib/journal";
+import { ShareButton } from "@/components/ShareButton";
 import { PRODUCTS } from "@/lib/products";
 import { ProductCard } from "@/components/ProductCard";
 import { JournalPlate } from "@/components/JournalPlate";
@@ -64,9 +65,12 @@ export default async function JournalPostPage({ params }: PageProps<"/journal/[s
       </section>
 
       <article className="mx-auto max-w-2xl px-4 py-14 sm:px-6">
-        <Link href="/journal" className="mb-8 inline-block text-sm text-ink-soft hover:text-terracotta">
-          ← Journal
-        </Link>
+        <div className="mb-8 flex items-center justify-between">
+          <Link href="/journal" className="text-sm text-ink-soft hover:text-terracotta">
+            ← Journal
+          </Link>
+          <ShareButton title={post.title} />
+        </div>
         <div className="flex flex-col gap-5 text-lg leading-relaxed text-ink-soft">
           {post.content.map((para, i) =>
             i === 0 ? (

@@ -77,12 +77,12 @@ export function LookScene({ look }: { look: Look }) {
               type="button"
               onClick={() => setActive(h.productId)}
               style={{ left: `${h.x}%`, top: `${h.y}%` }}
-              aria-label={`Ver ${product.name}`}
-              className="absolute -translate-x-1/2 -translate-y-1/2"
+              aria-label={`Ver ${product.name}, ${money(product.price)}`}
+              className="absolute flex h-11 w-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center"
             >
               {!isActive && (
                 <span
-                  className="motion-safe:animate-ping absolute inset-0 rounded-full opacity-60"
+                  className="motion-safe:animate-ping absolute h-8 w-8 rounded-full opacity-60"
                   style={{ backgroundColor: accent }}
                   aria-hidden="true"
                 />

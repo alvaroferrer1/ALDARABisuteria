@@ -6,6 +6,7 @@ import { ProductCard } from "@/components/ProductCard";
 import { CategoryFilters } from "@/components/CategoryFilters";
 import { ShopControls } from "@/components/ShopControls";
 import { ShopSidebarFilters } from "@/components/ShopSidebarFilters";
+import { ShopActiveFilterChips } from "@/components/ShopActiveFilterChips";
 import { ShopHero, ShopBreadcrumb, ShopPurposeBanner } from "@/components/ShopHero";
 
 const VALID_CATEGORIES: ProductCategory[] = ["pendientes", "pulseras", "colgantes", "charms"];
@@ -106,6 +107,9 @@ export default async function ShopPage({ searchParams }: PageProps<"/shop">) {
               <p className="py-16 text-center text-ink-soft">No encontramos piezas con esa búsqueda. Prueba con otra palabra.</p>
             ) : (
               <>
+                <Suspense>
+                  <ShopActiveFilterChips />
+                </Suspense>
                 <p className="mb-5 text-sm text-ink-soft">
                   {products.length} {products.length === 1 ? "pieza" : "piezas"}
                 </p>
