@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { readSessionCookieValue, SESSION_COOKIE_NAME } from "@/lib/auth";
-import { readJson, writeJson } from "@/lib/localDb";
+import { readJson, writeJson, withFileLock } from "@/lib/localDb";
+
+const FILE = "account-deletion-requests.json";
 
 interface DeletionRequest {
   email: string;
@@ -21,11 +23,13 @@ export async function POST() {
   const session = readSessionCookieValue(cookieStore.get(SESSION_COOKIE_NAME)?.value);
   if (!session) return NextResponse.json({ error: "No has iniciado sesión." }, { status: 401 });
 
-  const requests = await readJson<DeletionRequest[]>("account-deletion-requests.json", []);
-  if (!requests.some((r) => r.email.toLowerCase() === session.email.toLowerCase())) {
-    requests.push({ email: session.email, requestedAt: new Date().toISOString() });
-    await writeJson("account-deletion-requests.json", requests);
-  }
+  await withFileLock(FILE, async () => {
+    const requests = await readJson<DeletionRequest[]>(FILE, []);
+    if (!requests.some((r) => r.email.toLowerCase() === session.email.toLowerCase())) {
+      requests.push({ email: session.email, requestedAt: new Date().toISOString() });
+      await writeJson(FILE, requests);
+    }
+  });
 
   return NextResponse.json({ ok: true });
 }

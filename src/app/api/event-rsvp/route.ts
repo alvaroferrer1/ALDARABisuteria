@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { readJson, writeJson } from "@/lib/localDb";
+import { readJson, writeJson, withFileLock } from "@/lib/localDb";
 import { getEventBySlug } from "@/lib/events";
 import { checkRateLimit, ipKeyFrom, rateLimitedResponse } from "@/lib/rateLimit";
 
@@ -33,9 +33,11 @@ export async function POST(request: Request) {
   if (name.length < 2) return NextResponse.json({ error: "Escribe tu nombre." }, { status: 400 });
   if (!EMAIL_RE.test(email)) return NextResponse.json({ error: "Email inválido." }, { status: 400 });
 
-  const rsvps = await readJson<EventRsvp[]>(FILE, []);
-  rsvps.push({ eventSlug, name, email, receivedAt: new Date().toISOString() });
-  await writeJson(FILE, rsvps);
+  await withFileLock(FILE, async () => {
+    const rsvps = await readJson<EventRsvp[]>(FILE, []);
+    rsvps.push({ eventSlug, name, email, receivedAt: new Date().toISOString() });
+    await writeJson(FILE, rsvps);
+  });
 
   return NextResponse.json({ ok: true });
 }

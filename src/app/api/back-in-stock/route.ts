@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { randomUUID } from "node:crypto";
-import { readJson, writeJson } from "@/lib/localDb";
+import { readJson, writeJson, withFileLock } from "@/lib/localDb";
 import { getProductById } from "@/lib/products";
 import { checkRateLimit, ipKeyFrom, rateLimitedResponse } from "@/lib/rateLimit";
 
@@ -35,12 +35,14 @@ export async function POST(request: Request) {
   if (!product) return NextResponse.json({ error: "Producto no encontrado." }, { status: 404 });
   if (!EMAIL_RE.test(email)) return NextResponse.json({ error: "Escribe un email válido." }, { status: 400 });
 
-  const requests = await readJson<BackInStockRequest[]>(FILE, []);
-  const already = requests.some((r) => r.productId === productId && r.email.toLowerCase() === email.toLowerCase());
-  if (!already) {
-    requests.push({ id: randomUUID(), productId, email, createdAt: new Date().toISOString() });
-    await writeJson(FILE, requests);
-  }
+  await withFileLock(FILE, async () => {
+    const requests = await readJson<BackInStockRequest[]>(FILE, []);
+    const already = requests.some((r) => r.productId === productId && r.email.toLowerCase() === email.toLowerCase());
+    if (!already) {
+      requests.push({ id: randomUUID(), productId, email, createdAt: new Date().toISOString() });
+      await writeJson(FILE, requests);
+    }
+  });
   return NextResponse.json({ ok: true });
 }
 
@@ -50,8 +52,10 @@ export async function DELETE(request: Request) {
   const email = url.searchParams.get("email");
   if (!id || !email) return NextResponse.json({ error: "Faltan datos." }, { status: 400 });
 
-  const requests = await readJson<BackInStockRequest[]>(FILE, []);
-  const filtered = requests.filter((r) => !(r.id === id && r.email.toLowerCase() === email.toLowerCase()));
-  await writeJson(FILE, filtered);
+  await withFileLock(FILE, async () => {
+    const requests = await readJson<BackInStockRequest[]>(FILE, []);
+    const filtered = requests.filter((r) => !(r.id === id && r.email.toLowerCase() === email.toLowerCase()));
+    await writeJson(FILE, filtered);
+  });
   return NextResponse.json({ ok: true });
 }

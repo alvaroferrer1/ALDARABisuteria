@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
-import { readJson, writeJson } from "@/lib/localDb";
+import { readJson, writeJson, withFileLock } from "@/lib/localDb";
+
+const REQUESTS_FILE = "back-in-stock-requests.json";
 import { getProductById } from "@/lib/products";
 import { setStockOverride } from "@/lib/stock";
 import { sendEmails } from "@/lib/email";
@@ -39,11 +41,11 @@ export async function POST(request: Request) {
   await setStockOverride(productId, newStock);
 
   // Detectar solicitudes pendientes (sin notificar) de ese producto.
-  const requests = await readJson<BackInStockRequest[]>("back-in-stock-requests.json", []);
-  const pending = requests.filter((r) => r.productId === productId && !r.notifiedAt);
+  const pendingCount = await withFileLock(REQUESTS_FILE, async () => {
+    const requests = await readJson<BackInStockRequest[]>(REQUESTS_FILE, []);
+    const pending = requests.filter((r) => r.productId === productId && !r.notifiedAt);
+    if (pending.length === 0) return 0;
 
-  const now = new Date().toISOString();
-  if (pending.length > 0) {
     await sendEmails(
       pending.map((reqItem) => ({
         to: reqItem.email,
@@ -51,9 +53,11 @@ export async function POST(request: Request) {
         body: `Hola, la pieza que esperabas (${product.name}) ha vuelto a tener stock. Ya puedes comprarla en /producto/${product.slug}.`,
       })),
     );
+    const now = new Date().toISOString();
     const updated = requests.map((r) => (r.productId === productId && !r.notifiedAt ? { ...r, notifiedAt: now } : r));
-    await writeJson("back-in-stock-requests.json", updated);
-  }
+    await writeJson(REQUESTS_FILE, updated);
+    return pending.length;
+  });
 
-  return NextResponse.json({ ok: true, productId, newStock, notified: pending.length });
+  return NextResponse.json({ ok: true, productId, newStock, notified: pendingCount });
 }

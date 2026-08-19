@@ -1,4 +1,4 @@
-import { readJson, writeJson } from "./localDb";
+import { readJson, writeJson, withFileLock } from "./localDb";
 
 /**
  * Proveedor de email — punto único de salida de todos los correos reales
@@ -48,15 +48,19 @@ export async function sendEmail(email: OutgoingEmail): Promise<void> {
     console.warn("[email] RESEND_API_KEY detectada pero la integración real todavía no está implementada — usando DemoEmailProvider.");
   }
 
-  const demoEmails = await readJson<DemoEmailRecord[]>(DEMO_EMAILS_FILE, []);
-  demoEmails.push({ ...email, sentAt: new Date().toISOString() });
-  await writeJson(DEMO_EMAILS_FILE, demoEmails);
+  await withFileLock(DEMO_EMAILS_FILE, async () => {
+    const demoEmails = await readJson<DemoEmailRecord[]>(DEMO_EMAILS_FILE, []);
+    demoEmails.push({ ...email, sentAt: new Date().toISOString() });
+    await writeJson(DEMO_EMAILS_FILE, demoEmails);
+  });
 }
 
 export async function sendEmails(emails: OutgoingEmail[]): Promise<void> {
   if (emails.length === 0) return;
-  const demoEmails = await readJson<DemoEmailRecord[]>(DEMO_EMAILS_FILE, []);
-  const now = new Date().toISOString();
-  for (const email of emails) demoEmails.push({ ...email, sentAt: now });
-  await writeJson(DEMO_EMAILS_FILE, demoEmails);
+  await withFileLock(DEMO_EMAILS_FILE, async () => {
+    const demoEmails = await readJson<DemoEmailRecord[]>(DEMO_EMAILS_FILE, []);
+    const now = new Date().toISOString();
+    for (const email of emails) demoEmails.push({ ...email, sentAt: now });
+    await writeJson(DEMO_EMAILS_FILE, demoEmails);
+  });
 }

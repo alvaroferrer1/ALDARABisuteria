@@ -1,4 +1,4 @@
-import { readJson, writeJson } from "./localDb";
+import { readJson, writeJson, withFileLock } from "./localDb";
 
 /**
  * Analítica local y propia (Bloque 4 de la hoja de ruta, CLAUDE.md) — sin
@@ -30,11 +30,16 @@ const FILE = "analytics-events.json";
 // a escala (ahí haría falta una base de datos/almacén con agregación).
 const MAX_EVENTS = 20000;
 
+// El evento de mayor volumen del sitio (uno por cada cambio de ruta, en
+// cada visita con la cookie de analítica aceptada) — sin bloqueo, era el
+// que más rápido perdía datos bajo tráfico concurrente real.
 export async function recordEvent(event: AnalyticsEvent): Promise<void> {
-  const events = await readJson<AnalyticsEvent[]>(FILE, []);
-  events.push(event);
-  const trimmed = events.length > MAX_EVENTS ? events.slice(events.length - MAX_EVENTS) : events;
-  await writeJson(FILE, trimmed);
+  await withFileLock(FILE, async () => {
+    const events = await readJson<AnalyticsEvent[]>(FILE, []);
+    events.push(event);
+    const trimmed = events.length > MAX_EVENTS ? events.slice(events.length - MAX_EVENTS) : events;
+    await writeJson(FILE, trimmed);
+  });
 }
 
 export async function readEvents(): Promise<AnalyticsEvent[]> {

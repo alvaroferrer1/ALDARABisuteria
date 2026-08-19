@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { readJson, writeJson } from "@/lib/localDb";
+import { readJson, writeJson, withFileLock } from "@/lib/localDb";
 import { generateGiftCardCode, GIFT_CARD_AMOUNTS } from "@/lib/giftCards";
 import { sendEmail } from "@/lib/email";
 import { checkRateLimit, ipKeyFrom, rateLimitedResponse } from "@/lib/rateLimit";
@@ -49,9 +49,11 @@ export async function POST(request: Request) {
     createdAt: new Date().toISOString(),
   };
 
-  const cards = await readJson<GiftCard[]>(FILE, []);
-  cards.push(card);
-  await writeJson(FILE, cards);
+  await withFileLock(FILE, async () => {
+    const cards = await readJson<GiftCard[]>(FILE, []);
+    cards.push(card);
+    await writeJson(FILE, cards);
+  });
 
   // Envío real al destinatario si se indicó un email — mismo DemoEmailProvider
   // ya usado en recuperación de contraseña (registra el "email" en

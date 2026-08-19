@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { readJson, writeJson } from "@/lib/localDb";
+import { readJson, writeJson, withFileLock } from "@/lib/localDb";
 import { checkRateLimit, ipKeyFrom, rateLimitedResponse } from "@/lib/rateLimit";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -36,9 +36,11 @@ export async function POST(request: Request) {
   if (!EMAIL_RE.test(email)) return NextResponse.json({ error: "Email inválido." }, { status: 400 });
   if (message.length < 5) return NextResponse.json({ error: "Escribe tu mensaje." }, { status: 400 });
 
-  const messages = await readJson<ContactMessage[]>(FILE, []);
-  messages.push({ name, email, reason, message, orderId, receivedAt: new Date().toISOString() });
-  await writeJson(FILE, messages);
+  await withFileLock(FILE, async () => {
+    const messages = await readJson<ContactMessage[]>(FILE, []);
+    messages.push({ name, email, reason, message, orderId, receivedAt: new Date().toISOString() });
+    await writeJson(FILE, messages);
+  });
 
   // No hay servicio de email conectado todavía: el mensaje queda
   // guardado en data/contact-messages.json. Ver README para conectar

@@ -1,4 +1,4 @@
-import { readJson, writeJson } from "./localDb";
+import { readJson, writeJson, withFileLock } from "./localDb";
 import { getProductById } from "./products";
 
 const FILE = "stock-overrides.json";
@@ -31,7 +31,9 @@ export async function getEffectiveStock(productId: string): Promise<number | nul
 }
 
 export async function setStockOverride(productId: string, stock: number): Promise<void> {
-  const overrides = await readOverrides();
-  overrides[productId] = Math.max(0, stock);
-  await writeJson(FILE, overrides);
+  await withFileLock(FILE, async () => {
+    const overrides = await readOverrides();
+    overrides[productId] = Math.max(0, stock);
+    await writeJson(FILE, overrides);
+  });
 }

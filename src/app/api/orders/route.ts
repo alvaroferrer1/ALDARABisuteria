@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { randomUUID } from "node:crypto";
-import { readJson, writeJson } from "@/lib/localDb";
+import { readJson, writeJson, withFileLock } from "@/lib/localDb";
 import { PRODUCTS } from "@/lib/products";
 import { GIFT_WRAP_PRICE } from "@/lib/giftCards";
 import { readSessionCookieValue, SESSION_COOKIE_NAME } from "@/lib/auth";
@@ -84,22 +84,32 @@ export async function POST(request: Request) {
 
   // Canje real de tarjeta regalo: valida el código, descuenta del saldo
   // guardado de verdad (no es un descuento decorativo) y reduce el total.
+  //
+  // Bug real de concurrencia corregido: leer el saldo, decidir cuánto
+  // aplicar y escribir el nuevo saldo son 3 pasos separados — sin bloqueo,
+  // dos pedidos usando el mismo código A LA VEZ podían leer el mismo saldo
+  // de partida y ambos aplicarlo entero (doble gasto de la misma tarjeta).
+  // Todo el ciclo leer→validar→descontar va ahora dentro de un único
+  // withFileLock sobre gift-cards.json, así el segundo pedido espera a que
+  // el primero termine de escribir antes de leer el saldo ya actualizado.
   let giftCardCode: string | undefined;
   let giftCardApplied = 0;
   const rawCode = typeof body.giftCardCode === "string" ? body.giftCardCode.trim().toUpperCase() : "";
-  let cards: GiftCard[] = [];
-  let cardIndex = -1;
   if (rawCode) {
-    cards = await readJson<GiftCard[]>(GIFT_CARDS_FILE, []);
-    cardIndex = cards.findIndex((c) => c.code === rawCode);
-    if (cardIndex === -1) {
-      return NextResponse.json({ error: "El código de tarjeta regalo no es válido." }, { status: 400 });
+    const giftCardError = await withFileLock(GIFT_CARDS_FILE, async () => {
+      const cards = await readJson<GiftCard[]>(GIFT_CARDS_FILE, []);
+      const cardIndex = cards.findIndex((c) => c.code === rawCode);
+      if (cardIndex === -1) return "El código de tarjeta regalo no es válido.";
+      if (cards[cardIndex].balance <= 0) return "Esa tarjeta regalo ya no tiene saldo.";
+      giftCardApplied = Math.min(cards[cardIndex].balance, total);
+      giftCardCode = rawCode;
+      cards[cardIndex] = { ...cards[cardIndex], balance: cards[cardIndex].balance - giftCardApplied };
+      await writeJson(GIFT_CARDS_FILE, cards);
+      return null;
+    });
+    if (giftCardError) {
+      return NextResponse.json({ error: giftCardError }, { status: 400 });
     }
-    if (cards[cardIndex].balance <= 0) {
-      return NextResponse.json({ error: "Esa tarjeta regalo ya no tiene saldo." }, { status: 400 });
-    }
-    giftCardApplied = Math.min(cards[cardIndex].balance, total);
-    giftCardCode = rawCode;
   }
 
   // Identidad SIEMPRE resuelta desde la sesión firmada — nunca desde
@@ -150,18 +160,15 @@ export async function POST(request: Request) {
     ...(pointsRedeemed > 0 ? { pointsRedeemed, pointsDiscount } : {}),
   };
 
-  const orders = await readJson<DemoOrder[]>(FILE, []);
-  orders.push(order);
-  await writeJson(FILE, orders);
+  await withFileLock(FILE, async () => {
+    const orders = await readJson<DemoOrder[]>(FILE, []);
+    orders.push(order);
+    await writeJson(FILE, orders);
+  });
 
   const analyticsSessionId = typeof body.analyticsSessionId === "string" && /^[a-zA-Z0-9-]{8,64}$/.test(body.analyticsSessionId) ? body.analyticsSessionId : undefined;
   if (analyticsSessionId) {
     await recordEvent({ type: "purchase", path: "/checkout", sessionId: analyticsSessionId, ts: order.createdAt, meta: { total: order.total, items: items.length } });
-  }
-
-  if (giftCardCode && cardIndex !== -1) {
-    cards[cardIndex] = { ...cards[cardIndex], balance: cards[cardIndex].balance - giftCardApplied };
-    await writeJson(GIFT_CARDS_FILE, cards);
   }
 
   if (pointsRedeemed > 0 && session) {

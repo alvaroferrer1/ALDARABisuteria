@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { readJson, writeJson } from "@/lib/localDb";
+import { readJson, writeJson, withFileLock } from "@/lib/localDb";
 import { checkRateLimit, ipKeyFrom, rateLimitedResponse } from "@/lib/rateLimit";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -37,9 +37,11 @@ export async function POST(request: Request) {
   if (!EMAIL_RE.test(email)) return NextResponse.json({ error: "Email inválido." }, { status: 400 });
   if (!preferredDate) return NextResponse.json({ error: "Indica una fecha u horario preferido." }, { status: 400 });
 
-  const requests = await readJson<AppointmentRequest[]>(FILE, []);
-  requests.push({ name, email, mode, preferredDate, notes, receivedAt: new Date().toISOString() });
-  await writeJson(FILE, requests);
+  await withFileLock(FILE, async () => {
+    const requests = await readJson<AppointmentRequest[]>(FILE, []);
+    requests.push({ name, email, mode, preferredDate, notes, receivedAt: new Date().toISOString() });
+    await writeJson(FILE, requests);
+  });
 
   // Sin calendario/backend de citas real conectado: la solicitud queda
   // guardada en data/appointment-requests.json y se confirma manualmente

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { readJson, writeJson } from "@/lib/localDb";
+import { readJson, writeJson, withFileLock } from "@/lib/localDb";
 import { readSessionCookieValue, SESSION_COOKIE_NAME } from "@/lib/auth";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -32,17 +32,19 @@ export async function POST(request: Request) {
   if (pieceDescription.length < 3) return NextResponse.json({ error: "Describe qué pieza es." }, { status: 400 });
   if (issue.length < 3) return NextResponse.json({ error: "Cuéntanos qué le pasa a la pieza." }, { status: 400 });
 
-  const requests = await readJson<RepairRequest[]>(FILE, []);
   const entry: RepairRequest = {
-    id: `REP-${Date.now().toString(36).toUpperCase()}`,
+    id: `REP-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`,
     name,
     email,
     pieceDescription,
     issue,
     requestedAt: new Date().toISOString(),
   };
-  requests.push(entry);
-  await writeJson(FILE, requests);
+  await withFileLock(FILE, async () => {
+    const requests = await readJson<RepairRequest[]>(FILE, []);
+    requests.push(entry);
+    await writeJson(FILE, requests);
+  });
 
   return NextResponse.json({ ok: true, id: entry.id });
 }

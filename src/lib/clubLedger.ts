@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { readJson, writeJson } from "./localDb";
+import { readJson, writeJson, withFileLock } from "./localDb";
 
 const FILE = "club-ledger.json";
 
@@ -38,6 +38,9 @@ export async function getBalance(user: string): Promise<number> {
   return movements.reduce((sum, m) => sum + m.points, 0);
 }
 
+// withFileLock: dos pedidos ganando/canjeando puntos a la vez podían leer el
+// mismo ledger de partida y la segunda escritura borraba el movimiento de la
+// primera — mismo bug de concurrencia real que en pedidos/tarjetas regalo.
 export async function appendMovement(input: {
   user: string;
   type: ClubMovementType;
@@ -45,7 +48,6 @@ export async function appendMovement(input: {
   reason: string;
   orderId?: string;
 }): Promise<ClubMovement> {
-  const ledger = await getLedger();
   const movement: ClubMovement = {
     id: randomUUID(),
     user: input.user.toLowerCase(),
@@ -55,7 +57,10 @@ export async function appendMovement(input: {
     orderId: input.orderId,
     timestamp: new Date().toISOString(),
   };
-  ledger.push(movement);
-  await writeJson(FILE, ledger);
+  await withFileLock(FILE, async () => {
+    const ledger = await getLedger();
+    ledger.push(movement);
+    await writeJson(FILE, ledger);
+  });
   return movement;
 }

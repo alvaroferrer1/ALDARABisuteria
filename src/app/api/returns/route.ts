@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { readJson, writeJson } from "@/lib/localDb";
+import { readJson, writeJson, withFileLock } from "@/lib/localDb";
 import { readSessionCookieValue, SESSION_COOKIE_NAME } from "@/lib/auth";
 import type { DemoOrder } from "@/lib/types";
 
@@ -59,9 +59,8 @@ export async function POST(request: Request) {
 
   const item = productId ? order.items.find((i) => i.productId === productId) : undefined;
 
-  const requests = await readJson<ReturnRequest[]>(FILE, []);
   const entry: ReturnRequest = {
-    id: `DEV-${Date.now().toString(36).toUpperCase()}`,
+    id: `DEV-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`,
     orderId: order.id,
     email: session.email,
     productId,
@@ -70,8 +69,11 @@ export async function POST(request: Request) {
     description,
     requestedAt: new Date().toISOString(),
   };
-  requests.push(entry);
-  await writeJson(FILE, requests);
+  await withFileLock(FILE, async () => {
+    const requests = await readJson<ReturnRequest[]>(FILE, []);
+    requests.push(entry);
+    await writeJson(FILE, requests);
+  });
 
   return NextResponse.json({ ok: true, id: entry.id });
 }

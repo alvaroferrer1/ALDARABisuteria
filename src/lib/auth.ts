@@ -1,5 +1,5 @@
 import { randomBytes, scryptSync, timingSafeEqual, createHmac } from "node:crypto";
-import { readJson, writeJson } from "./localDb";
+import { readJson, writeJson, withFileLock } from "./localDb";
 import { sendEmail } from "./email";
 
 /**
@@ -36,16 +36,23 @@ export async function getUsers(): Promise<StoredUser[]> {
   return readJson<StoredUser[]>(USERS_FILE, []);
 }
 
+// withFileLock: dos registros a la vez (sobre todo con el mismo email
+// dos pestañas, doble clic) antes podían leer users.json antes de que
+// ninguno hubiera escrito — el segundo `some(...)` no veía al primero
+// todavía, y las dos cuentas se creaban, la última pisando a la primera
+// en el archivo. Ahora el ciclo comprobar+crear va entero dentro del lock.
 export async function createUser(email: string, name: string, password: string): Promise<PublicUser> {
-  const users = await getUsers();
-  if (users.some((u) => u.email.toLowerCase() === email.toLowerCase())) {
-    throw new Error("Ya existe una cuenta con ese email.");
-  }
-  const salt = randomBytes(16).toString("hex");
-  const user: StoredUser = { email, name, salt, passwordHash: hashPassword(password, salt), createdAt: new Date().toISOString() };
-  users.push(user);
-  await writeJson(USERS_FILE, users);
-  return { email: user.email, name: user.name };
+  return withFileLock(USERS_FILE, async () => {
+    const users = await getUsers();
+    if (users.some((u) => u.email.toLowerCase() === email.toLowerCase())) {
+      throw new Error("Ya existe una cuenta con ese email.");
+    }
+    const salt = randomBytes(16).toString("hex");
+    const user: StoredUser = { email, name, salt, passwordHash: hashPassword(password, salt), createdAt: new Date().toISOString() };
+    users.push(user);
+    await writeJson(USERS_FILE, users);
+    return { email: user.email, name: user.name };
+  });
 }
 
 export async function verifyUser(email: string, password: string): Promise<PublicUser | null> {
@@ -60,17 +67,19 @@ export async function verifyUser(email: string, password: string): Promise<Publi
 }
 
 export async function changePassword(email: string, currentPassword: string, newPassword: string): Promise<void> {
-  const users = await getUsers();
-  const idx = users.findIndex((u) => u.email.toLowerCase() === email.toLowerCase());
-  if (idx === -1) throw new Error("Cuenta no encontrada.");
-  const user = users[idx];
-  const candidate = hashPassword(currentPassword, user.salt);
-  const a = Buffer.from(candidate, "hex");
-  const b = Buffer.from(user.passwordHash, "hex");
-  if (a.length !== b.length || !timingSafeEqual(a, b)) throw new Error("La contraseña actual no es correcta.");
-  const salt = randomBytes(16).toString("hex");
-  users[idx] = { ...user, salt, passwordHash: hashPassword(newPassword, salt) };
-  await writeJson(USERS_FILE, users);
+  await withFileLock(USERS_FILE, async () => {
+    const users = await getUsers();
+    const idx = users.findIndex((u) => u.email.toLowerCase() === email.toLowerCase());
+    if (idx === -1) throw new Error("Cuenta no encontrada.");
+    const user = users[idx];
+    const candidate = hashPassword(currentPassword, user.salt);
+    const a = Buffer.from(candidate, "hex");
+    const b = Buffer.from(user.passwordHash, "hex");
+    if (a.length !== b.length || !timingSafeEqual(a, b)) throw new Error("La contraseña actual no es correcta.");
+    const salt = randomBytes(16).toString("hex");
+    users[idx] = { ...user, salt, passwordHash: hashPassword(newPassword, salt) };
+    await writeJson(USERS_FILE, users);
+  });
 }
 
 export interface PasswordResetToken {
@@ -100,10 +109,12 @@ export async function createPasswordResetToken(email: string): Promise<string | 
   if (!user) return null;
 
   const token = randomBytes(32).toString("hex");
-  const tokens = await readJson<PasswordResetToken[]>(RESET_TOKENS_FILE, []);
-  const withoutExisting = tokens.filter((t) => t.email.toLowerCase() !== email.toLowerCase());
-  withoutExisting.push({ email: user.email, tokenHash: hashToken(token), expiresAt: new Date(Date.now() + RESET_TOKEN_TTL_MS).toISOString() });
-  await writeJson(RESET_TOKENS_FILE, withoutExisting);
+  await withFileLock(RESET_TOKENS_FILE, async () => {
+    const tokens = await readJson<PasswordResetToken[]>(RESET_TOKENS_FILE, []);
+    const withoutExisting = tokens.filter((t) => t.email.toLowerCase() !== email.toLowerCase());
+    withoutExisting.push({ email: user.email, tokenHash: hashToken(token), expiresAt: new Date(Date.now() + RESET_TOKEN_TTL_MS).toISOString() });
+    await writeJson(RESET_TOKENS_FILE, withoutExisting);
+  });
 
   await sendEmail({
     to: user.email,
@@ -124,14 +135,19 @@ export async function resetPasswordWithToken(email: string, token: string, newPa
   const b = Buffer.from(entry.tokenHash, "hex");
   if (a.length !== b.length || !timingSafeEqual(a, b)) throw new Error("El enlace de recuperación no es válido.");
 
-  const users = await getUsers();
-  const idx = users.findIndex((u) => u.email.toLowerCase() === email.toLowerCase());
-  if (idx === -1) throw new Error("Cuenta no encontrada.");
-  const salt = randomBytes(16).toString("hex");
-  users[idx] = { ...users[idx], salt, passwordHash: hashPassword(newPassword, salt) };
-  await writeJson(USERS_FILE, users);
+  await withFileLock(USERS_FILE, async () => {
+    const users = await getUsers();
+    const idx = users.findIndex((u) => u.email.toLowerCase() === email.toLowerCase());
+    if (idx === -1) throw new Error("Cuenta no encontrada.");
+    const salt = randomBytes(16).toString("hex");
+    users[idx] = { ...users[idx], salt, passwordHash: hashPassword(newPassword, salt) };
+    await writeJson(USERS_FILE, users);
+  });
 
-  await writeJson(RESET_TOKENS_FILE, tokens.filter((t) => t.email.toLowerCase() !== email.toLowerCase()));
+  await withFileLock(RESET_TOKENS_FILE, async () => {
+    const current = await readJson<PasswordResetToken[]>(RESET_TOKENS_FILE, []);
+    await writeJson(RESET_TOKENS_FILE, current.filter((t) => t.email.toLowerCase() !== email.toLowerCase()));
+  });
 }
 
 function sign(value: string): string {
