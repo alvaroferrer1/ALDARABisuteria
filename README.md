@@ -29,17 +29,11 @@ El Style Lab deja que cada clienta arme su propia combinación pieza a pieza, co
 
 <br><br>
 
-## Todo lo que hay detrás de la compra
+## Más que un carrito y un botón de pagar
 
-No es solo un catálogo bonito. Buscador de Regalos, Charm Studio, Joyero Digital con el Pasaporte de cada pieza, Club de fidelidad, tarjetas regalo, historias de regalo privadas, cuentas con sesión real, seguimiento de pedidos, reparaciones, devoluciones — la parte que la mayoría de demos se salta.
+Encontrar la pieza es solo el principio. El Buscador de Regalos pregunta para quién es y en qué ocasión, y propone sin que la clienta tenga que adivinar. El Charm Studio y el Style Lab convierten "elegir" en "diseñar" — cada combinación con su precio real, lista para la cesta. Y cada joya que se compra se queda: en el Joyero Digital, con su propio Pasaporte contando de dónde viene.
 
-## Diseño
-
-Paleta cálida (marfil, arena, dorado, terracota), modo claro y oscuro cuidados por igual, tipografía editorial (Cormorant Garamond + Montserrat). Composición fotográfica real donde ya existe material, e identidad visual generativa propia —nunca un hueco roto— donde todavía no la hay.
-
-## Stack
-
-Next.js + React + TypeScript, Tailwind CSS v4, sin dependencias de UI externas. Verificado con Playwright contra build de producción real, no contra un servidor de desarrollo.
+Después de la compra sigue habiendo marca: pedidos con seguimiento propio, reparaciones, devoluciones sin fricción, un Club que recompensa quedarse, tarjetas regalo, historias privadas para acompañar un regalo con algo que solo esa persona va a leer. Todo con cuentas reales, no una promesa de "próximamente".
 
 ---
 

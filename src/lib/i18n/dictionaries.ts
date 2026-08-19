@@ -16,7 +16,7 @@ export const dictionaries = {
     announcements: { handmade: "Hechas a mano con amor", cultures: "Culturas que nos unen", shipping: "Envíos gratis desde 60€" },
     nav: { new: "Nuevo", jewelry: "Joyas", collections: "Colecciones", personalized: "Personalizadas", giftFinder: "Buscador de Regalos", gifts: "Regalos", about: "Sobre ALDARA", contact: "Contacto" },
     mega: { viewAll: "Ver todo el catálogo →", lookbook: "Lookbook", theEdit: "The Edit", moodShop: "Mood Shop", shopTheMoment: "Shop the Moment", atelier: "Atelier" },
-    header: { search: "Buscar", wishlist: "Ver favoritos", cart: "Abrir cesta", menu: "Abrir menú", closeMenu: "Cerrar menú" },
+    header: { search: "Buscar", wishlist: "Ver favoritos", cart: "Abrir cesta", menu: "Abrir menú", closeMenu: "Cerrar menú", account: "Mi cuenta" },
     common: {
       addToCart: "Añadir a la cesta",
       added: "Añadido ✓",
@@ -765,7 +765,7 @@ export const dictionaries = {
     announcements: { handmade: "Handmade with love", cultures: "Cultures that unite us", shipping: "Free shipping from €60" },
     nav: { new: "New", jewelry: "Jewelry", collections: "Collections", personalized: "Personalized", giftFinder: "Gift Finder", gifts: "Gifts", about: "About ALDARA", contact: "Contact" },
     mega: { viewAll: "View full catalog →", lookbook: "Lookbook", theEdit: "The Edit", moodShop: "Mood Shop", shopTheMoment: "Shop the Moment", atelier: "Atelier" },
-    header: { search: "Search", wishlist: "View wishlist", cart: "Open cart", menu: "Open menu", closeMenu: "Close menu" },
+    header: { search: "Search", wishlist: "View wishlist", cart: "Open cart", menu: "Open menu", closeMenu: "Close menu", account: "My account" },
     common: {
       addToCart: "Add to cart",
       added: "Added ✓",
@@ -1514,7 +1514,7 @@ export const dictionaries = {
     announcements: { handmade: "Fait main avec amour", cultures: "Des cultures qui nous unissent", shipping: "Livraison gratuite dès 60€" },
     nav: { new: "Nouveau", jewelry: "Bijoux", collections: "Collections", personalized: "Personnalisées", giftFinder: "Idées cadeaux", gifts: "Cadeaux", about: "À propos de ALDARA", contact: "Contact" },
     mega: { viewAll: "Voir tout le catalogue →", lookbook: "Lookbook", theEdit: "The Edit", moodShop: "Mood Shop", shopTheMoment: "Shop the Moment", atelier: "Atelier" },
-    header: { search: "Rechercher", wishlist: "Voir mes favoris", cart: "Ouvrir le panier", menu: "Ouvrir le menu", closeMenu: "Fermer le menu" },
+    header: { search: "Rechercher", wishlist: "Voir mes favoris", cart: "Ouvrir le panier", menu: "Ouvrir le menu", closeMenu: "Fermer le menu", account: "Mon compte" },
     common: {
       addToCart: "Ajouter au panier",
       added: "Ajouté ✓",

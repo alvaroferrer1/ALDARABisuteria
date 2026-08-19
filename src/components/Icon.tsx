@@ -12,7 +12,7 @@
  * componente porque son ilustrativos, no de interfaz — este registro cubre
  * los de INTERFAZ reutilizados en todo el sitio.
  */
-export type IconName = "search" | "heart" | "heart-filled" | "cart" | "close" | "whatsapp" | "instagram" | "check";
+export type IconName = "search" | "heart" | "heart-filled" | "cart" | "close" | "whatsapp" | "instagram" | "check" | "user";
 
 const PATHS: Record<IconName, { path: string; fill?: "currentColor" | "none"; strokeWidth?: number; strokeless?: boolean }> = {
   search: { path: "M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14Zm10 17-5.6-5.6", fill: "none", strokeWidth: 2 },
@@ -32,6 +32,11 @@ const PATHS: Record<IconName, { path: string; fill?: "currentColor" | "none"; st
     strokeless: true,
   },
   close: { path: "M6 6l12 12M18 6 6 18", fill: "none", strokeWidth: 2 },
+  user: {
+    path: "M12 12a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9Zm0 2c-4.4 0-8 2.24-8 5v1a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-1c0-2.76-3.6-5-8-5Z",
+    fill: "none",
+    strokeWidth: 1.5,
+  },
   check: { path: "M5 12.5 9.5 17 19 7", fill: "none", strokeWidth: 2 },
   whatsapp: {
     path: "M20.5 3.5a11.8 11.8 0 0 0-16.7 16.6L2 22l2-1.7A11.8 11.8 0 1 0 20.5 3.5ZM12 20.2a8.2 8.2 0 0 1-4.2-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.3 8.3 0 1 1 12 20.2Zm4.5-6.2c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1s-.6.8-.8 1c-.1.2-.3.2-.5.1a6.6 6.6 0 0 1-3.3-2.9c-.2-.4.2-.4.6-1.2.1-.1 0-.3 0-.4l-.7-1.6c-.2-.4-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2c0 1.3 1 2.6 1.1 2.8.1.2 2 3 4.8 4.2.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.1-1.2-.1-.1-.2-.2-.4-.3Z",

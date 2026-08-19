@@ -25,13 +25,27 @@ export function ContactContent({ heroProduct }: { heroProduct?: Product }) {
 
   return (
     <>
-      <section className="grid gap-8 border-b border-line md:grid-cols-2 md:items-center">
+      <section className="relative grid gap-8 overflow-hidden border-b border-line md:grid-cols-2 md:items-center">
+        <div
+          className="absolute inset-0 -z-10 opacity-40"
+          style={{ background: heroProduct ? `radial-gradient(circle at 30% 20%, var(--gold-light), transparent 60%)` : undefined }}
+          aria-hidden="true"
+        />
         <div className="px-4 py-16 sm:px-6 md:py-24">
           <p className="mb-3 text-xs font-bold uppercase tracking-widest text-terracotta">{c.eyebrow}</p>
           <h1 className="font-display text-4xl font-semibold sm:text-5xl">
             {c.title1} <em className="not-italic text-terracotta">{c.title2}</em>
           </h1>
           <p className="mt-4 max-w-md text-ink-soft">{c.subtitle}</p>
+          <a
+            href={whatsappHref()}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-7 inline-flex items-center gap-2 rounded-full bg-ink px-6 py-3 text-sm font-semibold text-ivory hover:-translate-y-0.5 transition-transform"
+          >
+            {c.goToWhatsapp}
+            <span aria-hidden="true">→</span>
+          </a>
         </div>
         {heroProduct && <ProductPlate product={heroProduct} className="aspect-4/3 rounded-none md:aspect-square" iconSize={220} />}
       </section>

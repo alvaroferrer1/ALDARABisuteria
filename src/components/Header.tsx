@@ -208,6 +208,13 @@ export function Header() {
         </nav>
 
         <div className="flex items-center gap-0.5 sm:gap-2">
+          <Link
+            href="/account"
+            aria-label={t.header.account}
+            className="hidden h-9 w-9 items-center justify-center rounded-full text-white hover:bg-white/10 sm:flex"
+          >
+            <Icon name="user" size={18} />
+          </Link>
           <button
             type="button"
             onClick={openSearch}
@@ -266,6 +273,12 @@ export function Header() {
         style={{ backgroundColor: "#0d1220" }}
       >
         <ul className="flex flex-col px-4">
+          <li className="border-b border-white/10">
+            <Link href="/account" onClick={() => setMenuOpen(false)} className="flex items-center gap-2 py-3.5 text-sm font-medium text-[#d4af37]">
+              <Icon name="user" size={16} />
+              {t.header.account}
+            </Link>
+          </li>
           {NAV_LINKS.map((link) => (
             <li key={link.href} className="border-b border-white/10">
               <Link href={link.href} onClick={() => setMenuOpen(false)} className="block py-3.5 text-sm font-medium text-white">
