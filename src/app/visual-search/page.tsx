@@ -103,11 +103,16 @@ export default function VisualSearchPage() {
           .
         </p>
       ) : (
-        <div className="grid gap-7 sm:grid-cols-2 lg:grid-cols-4">
-          {results.map((p) => (
-            <ProductCard key={p.id} product={p} />
-          ))}
-        </div>
+        <>
+          <p className="mb-5 text-sm text-ink-soft">
+            {results.length} {results.length === 1 ? "pieza" : "piezas"}
+          </p>
+          <div className="grid gap-7 sm:grid-cols-2 lg:grid-cols-4">
+            {results.map((p) => (
+              <ProductCard key={p.id} product={p} />
+            ))}
+          </div>
+        </>
       )}
     </section>
   );
