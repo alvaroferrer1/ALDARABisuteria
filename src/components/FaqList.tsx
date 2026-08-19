@@ -37,6 +37,10 @@ function slugifyGroupTitle(title: string) {
 export function FaqList({ groups }: { groups: FaqGroup[] }) {
   const { t } = useTranslations();
   const [query, setQuery] = useState("");
+  // Voto "¿te ha sido útil?" por pregunta — señal barata de qué contenido
+  // falta (POST_AUDIT_IMPROVEMENTS.md, bloque Y). Solo estado de sesión, no
+  // hace falta persistirlo para que sea una señal real.
+  const [voted, setVoted] = useState<Record<string, "yes" | "no">>({});
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -94,7 +98,22 @@ export function FaqList({ groups }: { groups: FaqGroup[] }) {
                     {item.q}
                     <span className="text-terracotta transition-transform group-open:rotate-45">+</span>
                   </summary>
-                  <p className="pb-4 text-sm text-ink-soft">{item.a}</p>
+                  <p className="pb-3 text-sm text-ink-soft">{item.a}</p>
+                  <div className="flex items-center gap-2 pb-4 text-xs text-ink-soft">
+                    {voted[item.q] ? (
+                      <span>Gracias por tu respuesta.</span>
+                    ) : (
+                      <>
+                        <span>¿Te ha sido útil?</span>
+                        <button type="button" onClick={() => setVoted((v) => ({ ...v, [item.q]: "yes" }))} className="rounded-full border border-line px-2.5 py-1 font-semibold hover:border-terracotta">
+                          Sí
+                        </button>
+                        <button type="button" onClick={() => setVoted((v) => ({ ...v, [item.q]: "no" }))} className="rounded-full border border-line px-2.5 py-1 font-semibold hover:border-terracotta">
+                          No
+                        </button>
+                      </>
+                    )}
+                  </div>
                 </details>
               ))}
             </div>

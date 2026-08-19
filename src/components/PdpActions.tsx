@@ -68,7 +68,26 @@ export function PdpActions({
               +
             </button>
           </div>
-          <span className="text-sm text-ink-soft">{stock > 0 ? `${stock} ${t.pdp.availableSuffix}` : t.common.outOfStock}</span>
+          {stock > 0 ? (
+            <span className="flex items-center gap-1.5 text-sm text-ink-soft">
+              {/* Nivel visual de stock (bajo/medio/alto) — mismos umbrales que
+                  el resto del sitio usa para "últimas unidades", solo con
+                  apoyo visual además del número (POST_AUDIT_IMPROVEMENTS.md,
+                  bloque C). */}
+              <span className="flex gap-0.5" aria-hidden="true">
+                {[0, 1, 2].map((i) => (
+                  <span
+                    key={i}
+                    className="h-3 w-1 rounded-full"
+                    style={{ backgroundColor: i < (stock <= 3 ? 1 : stock <= 10 ? 2 : 3) ? "var(--terracotta)" : "var(--line)" }}
+                  />
+                ))}
+              </span>
+              {stock} {t.pdp.availableSuffix}
+            </span>
+          ) : (
+            <span className="text-sm text-ink-soft">{t.common.outOfStock}</span>
+          )}
         </div>
         <div className="flex gap-3">
           <button

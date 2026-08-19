@@ -9,7 +9,23 @@ export function AuthForms() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [remember, setRemember] = useState(true);
+  const [password, setPassword] = useState("");
   const router = useRouter();
+
+  // Fuerza de contraseña en tiempo real (POST_AUDIT_IMPROVEMENTS.md, bloque
+  // R) — el mínimo de 8 caracteres ya se valida en servidor, esto es solo
+  // feedback visual en cliente, criterio simple y honesto (longitud +
+  // variedad de caracteres), no una librería de "fuerza" con falsa precisión.
+  const passwordScore = (() => {
+    if (!password) return 0;
+    let score = password.length >= 8 ? 1 : 0;
+    if (password.length >= 12) score++;
+    if (/[A-Z]/.test(password) && /[a-z]/.test(password)) score++;
+    if (/[0-9]/.test(password)) score++;
+    return score;
+  })();
+  const strengthLabel = ["Muy corta", "Débil", "Aceptable", "Buena", "Fuerte"][passwordScore];
+  const strengthColor = ["#b3261e", "#c9711a", "#c9a020", "#7a9a3f", "#3f8f5f"][passwordScore];
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -76,8 +92,26 @@ export function AuthForms() {
             required
             minLength={8}
             maxLength={100}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             className="rounded-lg border border-line bg-surface px-3.5 py-2.5"
           />
+          {mode === "register" && password && (
+            <div className="mt-0.5">
+              <div className="flex gap-1">
+                {[0, 1, 2, 3].map((i) => (
+                  <span
+                    key={i}
+                    className="h-1 flex-1 rounded-full transition-colors"
+                    style={{ backgroundColor: i < passwordScore ? strengthColor : "var(--line)" }}
+                  />
+                ))}
+              </div>
+              <span className="mt-1 block text-xs" style={{ color: strengthColor }}>
+                {strengthLabel}
+              </span>
+            </div>
+          )}
         </label>
 
         {mode === "login" && (

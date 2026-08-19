@@ -101,6 +101,12 @@ function SearchOverlayPanel() {
           </button>
         </div>
 
+        {/* Anuncio para lectores de pantalla del número de resultados tras
+            cada búsqueda — antes solo había confirmación visual. */}
+        <p className="sr-only" role="status" aria-live="polite">
+          {query.trim() !== "" && `${results.length} ${results.length === 1 ? "resultado" : "resultados"} para "${query}"`}
+        </p>
+
         <div className="flex-1 overflow-y-auto p-2">
           {query.trim() === "" ? (
             history.length > 0 ? (

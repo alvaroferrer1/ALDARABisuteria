@@ -74,16 +74,29 @@ export default function ComparePage() {
                 </tr>
               </thead>
               <tbody>
-                {rows.map((row) => (
-                  <tr key={row.label} className="border-t border-line">
-                    <td className="py-4 pr-3 align-top text-xs font-bold uppercase tracking-widest text-ink-soft">{row.label}</td>
-                    {products.map((p) => (
-                      <td key={p.id} className="px-3 py-4 align-top text-ink-soft">
-                        {row.render(p)}
-                      </td>
-                    ))}
-                  </tr>
-                ))}
+                {rows.map((row) => {
+                  // Resalta el precio más bajo real cuando hay diferencia de
+                  // verdad entre los productos comparados — no un adorno,
+                  // ayuda a decidir de un vistazo (POST_AUDIT_IMPROVEMENTS.md,
+                  // bloque DD).
+                  const isPriceRow = row.label === t.misc.compareRowPrice;
+                  const minPrice = isPriceRow ? Math.min(...products.map((p) => p.price)) : null;
+                  const pricesDiffer = isPriceRow && new Set(products.map((p) => p.price)).size > 1;
+                  return (
+                    <tr key={row.label} className="border-t border-line">
+                      <td className="py-4 pr-3 align-top text-xs font-bold uppercase tracking-widest text-ink-soft">{row.label}</td>
+                      {products.map((p) => {
+                        const isBestPrice = pricesDiffer && p.price === minPrice;
+                        return (
+                          <td key={p.id} className={`px-3 py-4 align-top ${isBestPrice ? "font-semibold text-terracotta" : "text-ink-soft"}`}>
+                            {row.render(p)}
+                            {isBestPrice && <span className="ml-1.5 text-xs">↓ más barato</span>}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

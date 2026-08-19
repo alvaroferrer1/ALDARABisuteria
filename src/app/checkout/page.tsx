@@ -205,7 +205,19 @@ export default function CheckoutPage() {
 
           {step === 1 && (
             <>
-              <h2 className="font-semibold">{t.checkout.paymentMethodTitle}</h2>
+              <div className="flex items-center justify-between">
+                <h2 className="font-semibold">{t.checkout.paymentMethodTitle}</h2>
+                {/* Refuerzo de confianza estándar de ecommerce — texto, no
+                    logotipos exactos de marcas registradas (evita reproducir
+                    de forma imprecisa un logo de terceros). */}
+                <div className="flex gap-1.5" aria-hidden="true">
+                  {["VISA", "Mastercard", "Bizum"].map((brand) => (
+                    <span key={brand} className="rounded border border-line px-1.5 py-0.5 text-[0.6rem] font-bold uppercase tracking-wide text-ink-soft">
+                      {brand}
+                    </span>
+                  ))}
+                </div>
+              </div>
               <div className="flex flex-col gap-2.5">
                 {PAYMENT_METHODS.map((m) => (
                   <label
