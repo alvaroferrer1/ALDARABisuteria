@@ -8,5 +8,25 @@
     "date": "",
     "productName": "",
     "createdAt": "2026-08-19T07:45:39.993Z"
+  },
+  {
+    "token": "XGxG8-7dfAoi2u-zL3-3Rw",
+    "recipientName": "Ana E2E",
+    "message": "Feliz cumpleaños de prueba E2E.",
+    "occasion": "Cumpleaños",
+    "place": "",
+    "date": "",
+    "productName": "",
+    "createdAt": "2026-08-19T07:52:14.881Z"
+  },
+  {
+    "token": "w1TjarKBw0_Jq9SRniXDaw",
+    "recipientName": "Ana E2E",
+    "message": "Feliz cumpleaños de prueba E2E.",
+    "occasion": "Cumpleaños",
+    "place": "",
+    "date": "",
+    "productName": "",
+    "createdAt": "2026-08-19T07:52:46.729Z"
   }
 ]

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useTranslations } from "@/lib/i18n/localeStore";
 import { money } from "@/lib/storage";
 import { PhotoSlot } from "@/components/PhotoSlot";
+import { getAllCollections } from "@/lib/collections";
 
 interface Tier {
   name: string;
@@ -16,6 +17,14 @@ const TIERS: Tier[] = [
   { name: "Lunar", min: 60, perkKey: "clubTier2Perk" },
   { name: "Luz", min: 150, perkKey: "clubTier3Perk" },
 ];
+
+// Color real de cada nivel — reutiliza `collection.color` (misma identidad
+// de marca que ya existe para las colecciones Raíces/Lunar/Luz) en vez de
+// inventar una paleta nueva solo para el Club, para reforzar visualmente
+// que los nombres de nivel no son arbitrarios.
+function tierColor(name: string) {
+  return getAllCollections().find((c) => c.name === name)?.color ?? "var(--terracotta)";
+}
 
 function tierFor(spent: number) {
   return [...TIERS].reverse().find((t) => spent >= t.min) ?? TIERS[0];
@@ -45,6 +54,8 @@ export function ClubContent({
   const { t } = useTranslations();
   const m = t.misc;
   const tier = tierFor(spent);
+  const nextTier = TIERS[TIERS.findIndex((tr) => tr.name === tier.name) + 1];
+  const progressPct = nextTier ? Math.min(100, Math.round((spent / nextTier.min) * 100)) : 100;
 
   return (
     <section className="mx-auto max-w-3xl px-4 py-16 sm:px-6">
@@ -77,6 +88,24 @@ export function ClubContent({
               ? m.clubNoOrders
               : `${m.clubCalculatedOn} ${orderCount} ${orderCount === 1 ? m.clubOrder : m.clubOrders} (${money(spent)} ${m.clubInTotal}).`}
           </p>
+
+          {nextTier && (
+            <div className="mt-4">
+              <div className="mb-1.5 flex items-center justify-between text-xs text-ink-soft">
+                <span>{tier.name}</span>
+                <span>
+                  Te faltan {money(Math.max(0, nextTier.min - spent))} para {nextTier.name}
+                </span>
+              </div>
+              <div className="h-1.5 overflow-hidden rounded-full bg-line" role="progressbar" aria-valuenow={progressPct} aria-valuemin={0} aria-valuemax={100}>
+                <div
+                  className="h-full rounded-full transition-all duration-300"
+                  style={{ width: `${progressPct}%`, backgroundColor: tierColor(nextTier.name) }}
+                />
+              </div>
+            </div>
+          )}
+
           <p className="mt-3 text-xs text-ink-soft">{m.clubRedeemHint}</p>
         </div>
       )}
@@ -104,17 +133,31 @@ export function ClubContent({
 
       <h2 className="mt-12 mb-4 text-sm font-semibold uppercase tracking-wide text-ink-soft">{m.clubLevelsTitle}</h2>
       <ul className="flex flex-col gap-3">
-        {TIERS.map((tr) => (
-          <li key={tr.name} className="flex items-center justify-between rounded-xl border border-line px-5 py-4">
-            <div>
-              <p className="font-semibold">{tr.name}</p>
-              <p className="text-sm text-ink-soft">{m[tr.perkKey]}</p>
-            </div>
-            <span className="text-sm text-ink-soft">
-              {m.clubFrom} {tr.min} {m.clubPts}
-            </span>
-          </li>
-        ))}
+        {TIERS.map((tr) => {
+          const isCurrent = isAuthenticated && tr.name === tier.name;
+          return (
+            <li
+              key={tr.name}
+              className={`flex items-center justify-between rounded-xl border px-5 py-4 ${isCurrent ? "bg-surface-2" : "border-line"}`}
+              style={{ borderLeftColor: tierColor(tr.name), borderLeftWidth: 3, borderColor: isCurrent ? tierColor(tr.name) : undefined }}
+            >
+              <div>
+                <p className="flex items-center gap-2 font-semibold">
+                  {tr.name}
+                  {isCurrent && (
+                    <span className="rounded-full px-2 py-0.5 text-[0.65rem] font-bold uppercase text-white" style={{ backgroundColor: tierColor(tr.name) }}>
+                      {m.clubLevel}
+                    </span>
+                  )}
+                </p>
+                <p className="text-sm text-ink-soft">{m[tr.perkKey]}</p>
+              </div>
+              <span className="text-sm text-ink-soft">
+                {m.clubFrom} {tr.min} {m.clubPts}
+              </span>
+            </li>
+          );
+        })}
       </ul>
 
       <p className="mt-8 text-xs text-ink-soft">

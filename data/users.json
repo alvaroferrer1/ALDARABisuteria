@@ -1,9 +1,1 @@
-[
-  {
-    "email": "e2e-account@example.com",
-    "name": "E2E User",
-    "salt": "e9caf8fa9a2978e31fcf7f70a170b82e",
-    "passwordHash": "e109c5ed4c72d96052dd58ce1fc48475c3ccbce3354355f8d0474a1fd2f7c288b7d165b56a88badf0ae3564e4117c3beee1f2766d1aac33066095d794524175e",
-    "createdAt": "2026-08-19T07:45:38.488Z"
-  }
-]
+[]
