@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Icon } from "@/components/Icon";
 
 export const metadata: Metadata = {
   title: "Accesibilidad",
@@ -56,11 +57,16 @@ export default function AccesibilidadPage() {
 
       <section className="mx-auto max-w-2xl px-4 pb-14 sm:px-6">
         <h2 className="mb-6 font-semibold">Ya implementado</h2>
-        <ul className="flex flex-col gap-6">
+        <ul className="flex flex-col gap-5">
           {IMPLEMENTED.map((item) => (
-            <li key={item.title} className="border-b border-line pb-6 last:border-none">
-              <p className="font-semibold text-ink">{item.title}</p>
-              <p className="mt-1 text-sm text-ink-soft">{item.text}</p>
+            <li key={item.title} className="flex gap-4 rounded-2xl border border-line p-5">
+              <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gold-light text-ink" aria-hidden="true">
+                <Icon name="check" size={13} />
+              </span>
+              <div>
+                <p className="font-semibold text-ink">{item.title}</p>
+                <p className="mt-1 text-sm text-ink-soft">{item.text}</p>
+              </div>
             </li>
           ))}
         </ul>
@@ -68,10 +74,10 @@ export default function AccesibilidadPage() {
 
       <section className="mx-auto max-w-2xl px-4 pb-24 sm:px-6">
         <h2 className="mb-4 font-semibold">Todavía no — honestamente</h2>
-        <ul className="flex flex-col gap-2 text-sm text-ink-soft">
+        <ul className="flex flex-col gap-3 rounded-2xl bg-surface-2 p-5 text-sm text-ink-soft">
           {PENDING.map((item) => (
-            <li key={item} className="flex gap-2">
-              <span aria-hidden="true">·</span>
+            <li key={item} className="flex gap-3">
+              <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full border border-ink-soft" aria-hidden="true" />
               {item}
             </li>
           ))}

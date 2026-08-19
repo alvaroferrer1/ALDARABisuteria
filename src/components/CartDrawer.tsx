@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import { useCart } from "@/context/CartContext";
 import { PRODUCTS } from "@/lib/products";
 import { money } from "@/lib/storage";
-import { ProductVisual } from "./ProductVisual";
+import { ProductPlate } from "./ProductPlate";
 import { whatsappHref } from "@/lib/whatsapp";
 
 export function CartDrawer() {
@@ -70,9 +70,7 @@ export function CartDrawer() {
                 if (!product) return null;
                 return (
                   <li key={line.productId} className="flex gap-3.5">
-                    <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-xl bg-surface-2">
-                      <ProductVisual product={product} size={32} />
-                    </div>
+                    <ProductPlate product={product} className="h-14 w-14 shrink-0 rounded-xl" />
                     <div className="flex-1">
                       <p className="text-sm font-semibold">{product.name}</p>
                       <p className="text-xs text-ink-soft">
