@@ -11,6 +11,8 @@ import {
 } from "./tools";
 import type { AssistantContext, AssistantReply } from "./types";
 import type { DemoOrder } from "@/lib/types";
+import { money } from "@/lib/storage";
+import { STORE_ADDRESS, STORE_HOURS } from "@/lib/whatsapp";
 
 const GIFT_WORDS = /regal|cumplea|aniversario|sorpresa/i;
 
@@ -47,6 +49,43 @@ export function getAssistantReply(
 
     case "human":
       return { intent, text: "Claro, te paso con el equipo por WhatsApp.", lowConfidence: true };
+
+    case "thanks":
+      return { intent, text: "¡A ti! Si necesitas algo más, aquí sigo. 🧡" };
+
+    case "farewell":
+      return { intent, text: "¡Hasta pronto! Si te surge algo más, aquí me tienes. 👋" };
+
+    case "price": {
+      if (!contextProduct) {
+        return {
+          intent,
+          text: "¿De qué pieza quieres saber el precio? Dime el nombre y te lo digo al momento.",
+          lowConfidence: true,
+          links: [{ href: "/shop", label: "Ver catálogo completo" }],
+        };
+      }
+      return {
+        intent,
+        text: `${contextProduct.name} cuesta ${money(contextProduct.price)}.`,
+        products: [contextProduct],
+        contextProductId: contextProduct.id,
+      };
+    }
+
+    case "payment":
+      return {
+        intent,
+        text: "Aceptamos tarjeta, PayPal y Bizum. Es un pedido de demostración: coordinamos el pago real contigo por WhatsApp o email tras confirmar.",
+        links: [{ href: "/checkout", label: "Ir al checkout" }],
+      };
+
+    case "location":
+      return {
+        intent,
+        text: `Nuestro taller está en ${STORE_ADDRESS}. Horario: ${STORE_HOURS}.`,
+        links: [{ href: "/tiendas", label: "Ver ubicación y horarios" }],
+      };
 
     case "catalog_search": {
       const category = detectCategory(q) ?? contextProduct?.category ?? null;
@@ -94,6 +133,29 @@ export function getAssistantReply(
 
     case "stock": {
       if (!contextProduct) {
+        // "¿Tenéis colgantes?" / "¿Hay pulseras?" — pregunta de disponibilidad
+        // por CATEGORÍA, no de una pieza concreta. Antes esto caía siempre en
+        // "¿qué pieza quieres consultar?" aunque la categoría estuviera clara
+        // en el propio mensaje — fallo real detectado probando el asistente
+        // con preguntas naturales, no solo con los casos ya cubiertos.
+        const category = detectCategory(q);
+        if (category) {
+          const products = searchCatalog({ category });
+          if (products.length === 0) {
+            return {
+              intent,
+              text: `Ahora mismo no tenemos ${categoryLabel(category).toLowerCase()} disponibles en catálogo real.`,
+              lowConfidence: true,
+              links: [{ href: "/shop", label: "Ver catálogo completo" }],
+            };
+          }
+          return {
+            intent,
+            text: `Sí, esto tenemos en ${categoryLabel(category).toLowerCase()}:`,
+            products,
+            contextProductId: products[0]?.id,
+          };
+        }
         return { intent, text: "¿Qué pieza quieres consultar? Dime el nombre y te digo si está disponible.", lowConfidence: true };
       }
       const status = getStockStatus(contextProduct);
@@ -156,11 +218,25 @@ export function getAssistantReply(
         ],
       };
 
-    default:
+    default: {
+      // Mensaje que solo nombra una pieza ("mapa del alma", "el aro caribe")
+      // sin ningún verbo/palabra clave reconocible — antes caía igual en la
+      // respuesta genérica de "no tengo información" pese a que el nombre
+      // del producto es una señal clarísima de lo que se está preguntando.
+      // Fallo real detectado probando el asistente con mensajes cortos.
+      if (mentioned) {
+        return {
+          intent: "unknown",
+          text: `${mentioned.name} — ${money(mentioned.price)}. ${mentioned.description}`,
+          products: [mentioned],
+          contextProductId: mentioned.id,
+        };
+      }
       return {
         intent: "unknown",
         text: "No tengo suficiente información para confirmártelo con seguridad. Prefiero no inventar una respuesta — te paso con el equipo si quieres.",
         lowConfidence: true,
       };
+    }
   }
 }

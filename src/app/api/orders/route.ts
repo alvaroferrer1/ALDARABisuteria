@@ -8,6 +8,7 @@ import { readSessionCookieValue, SESSION_COOKIE_NAME } from "@/lib/auth";
 import { getBalance, appendMovement } from "@/lib/clubLedger";
 import { POINTS_PER_EURO_DISCOUNT, pointsToEuros } from "@/lib/club";
 import { recordEvent } from "@/lib/analytics";
+import { computeShippingCost } from "@/lib/shipping";
 import type { DemoOrder, Address, GiftCard } from "@/lib/types";
 
 const FILE = "orders.json";
@@ -68,6 +69,13 @@ export async function POST(request: Request) {
   if (items.length === 0) {
     return NextResponse.json({ error: "Ningún producto válido en el pedido." }, { status: 400 });
   }
+
+  // Envío real, calculado en el servidor a partir del subtotal de producto
+  // (nunca de un importe que mande el cliente) — antes no se cobraba nunca,
+  // pese a que el carrito y el checkout prometían un cargo por debajo del
+  // umbral. Ver lib/shipping.ts.
+  const shippingCost = computeShippingCost(total);
+  total += shippingCost;
 
   const giftWrap = body.giftWrap === true;
   if (giftWrap) total += GIFT_WRAP_PRICE;
@@ -131,6 +139,7 @@ export async function POST(request: Request) {
     createdAt: new Date().toISOString(),
     items,
     total: Math.max(0, subtotalAfterGiftCard - pointsDiscount),
+    shippingCost,
     address: body.address,
     email,
     status: "recibido",

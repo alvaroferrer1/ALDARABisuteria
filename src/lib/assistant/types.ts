@@ -4,11 +4,16 @@ export type AssistantIntent =
   | "catalog_search"
   | "care"
   | "stock"
+  | "price"
+  | "payment"
+  | "location"
   | "order_status"
   | "returns"
   | "repair"
   | "personalization"
   | "greeting"
+  | "thanks"
+  | "farewell"
   | "human"
   | "unknown";
 

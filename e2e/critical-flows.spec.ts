@@ -126,3 +126,17 @@ test("404 real para ruta inexistente", async ({ page }) => {
   expect(res?.status()).toBe(404);
   await expect(page.getByRole("heading", { name: "404" })).toBeVisible();
 });
+
+test("Asistente ALDARA: busca por categoría y menciona producto suelto", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: "Abrir asistente ALDARA" }).click();
+  const input = page.getByLabel("Pregunta al asistente ALDARA");
+
+  await input.fill("¿Tenéis colgantes?");
+  await page.getByRole("button", { name: "Enviar" }).click();
+  await expect(page.getByText(/esto tenemos en colgantes/i)).toBeVisible();
+
+  await input.fill("mapa del alma");
+  await page.getByRole("button", { name: "Enviar" }).click();
+  await expect(page.getByText(/Mapa del Alma/).last()).toBeVisible();
+});

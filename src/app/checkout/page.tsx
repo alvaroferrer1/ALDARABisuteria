@@ -10,6 +10,7 @@ import { useTranslations } from "@/lib/i18n/localeStore";
 import { POINTS_PER_EURO_DISCOUNT, pointsToEuros } from "@/lib/club";
 import { activePaymentProvider } from "@/lib/payment";
 import { trackEvent, getAnalyticsSessionIdIfConsented } from "@/lib/trackEvent";
+import { computeShippingCost, FREE_SHIPPING_THRESHOLD } from "@/lib/shipping";
 
 type PaymentMethodId = "tarjeta" | "paypal" | "bizum";
 
@@ -92,7 +93,12 @@ export default function CheckoutPage() {
     }
   }
 
-  const subtotalWithWrap = totalPrice + (giftWrap ? GIFT_WRAP_PRICE : 0);
+  // Envío real: gratis a partir de FREE_SHIPPING_THRESHOLD sobre el
+  // subtotal de producto (sin envoltorio ni descuentos), igual que la
+  // barra de progreso del carrito — antes esto no se cobraba nunca, ver
+  // lib/shipping.ts.
+  const shippingCost = computeShippingCost(totalPrice);
+  const subtotalWithWrap = totalPrice + (giftWrap ? GIFT_WRAP_PRICE : 0) + shippingCost;
   const giftCardDiscount = giftCardStatus === "ok" && giftCardBalance !== null ? Math.min(giftCardBalance, subtotalWithWrap) : 0;
   const afterGiftCard = Math.max(0, subtotalWithWrap - giftCardDiscount);
   const maxUsefulPoints = Math.floor(afterGiftCard * POINTS_PER_EURO_DISCOUNT);
@@ -423,6 +429,19 @@ export default function CheckoutPage() {
             </label>
           )}
 
+          <div className="mt-3 flex justify-between text-sm">
+            <span>{t.checkout.shippingLine}</span>
+            {shippingCost === 0 ? (
+              <span className="font-semibold text-terracotta">{t.checkout.shippingFree}</span>
+            ) : (
+              <span>{money(shippingCost)}</span>
+            )}
+          </div>
+          {shippingCost > 0 && (
+            <p className="mt-1 text-xs text-ink-soft">
+              {t.checkout.shippingHint} {money(FREE_SHIPPING_THRESHOLD - totalPrice)} {t.checkout.shippingHintEnd}
+            </p>
+          )}
           {giftWrap && (
             <div className="mt-3 flex justify-between text-sm">
               <span>{t.checkout.giftWrapLine}</span>

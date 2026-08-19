@@ -16,6 +16,7 @@ import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
 import { PageTransition } from "@/components/PageTransition";
 import { CookieConsentBanner } from "@/components/CookieConsentBanner";
 import { AnalyticsTracker } from "@/components/AnalyticsTracker";
+import { DocumentTitleSync } from "@/components/DocumentTitleSync";
 
 // Cormorant Garamond (titulares) + Montserrat (cuerpo/UI) — tipografía exacta
 // de ALDARA_Propuesta_Cliente_FINAL_v2.pdf, Bloque 04 "Tipografía y jerarquía
@@ -121,6 +122,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           </CartProvider>
         </PhotoManifestProvider>
         <ServiceWorkerRegister />
+        <DocumentTitleSync />
         <Suspense fallback={null}>
           <AnalyticsTracker />
         </Suspense>

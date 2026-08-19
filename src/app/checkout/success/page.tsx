@@ -76,6 +76,10 @@ export default async function CheckoutSuccessPage({ searchParams }: PageProps<"/
             </li>
           ))}
         </ul>
+        <div className="mt-4 flex justify-between border-t border-line pt-4 text-sm">
+          <span>Envío</span>
+          <span>{order.shippingCost > 0 ? money(order.shippingCost) : "Gratis"}</span>
+        </div>
         {order.giftWrap ? (
           <div className="mt-4 flex justify-between border-t border-line pt-4 text-sm">
             <span>Envoltorio de regalo</span>

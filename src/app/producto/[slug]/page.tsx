@@ -10,6 +10,8 @@ import { Price } from "@/components/Price";
 import { Badge } from "@/components/Badge";
 import { RecentlyViewedTracker } from "@/components/RecentlyViewedTracker";
 import { RecentlyViewedRail } from "@/components/RecentlyViewedRail";
+import { StarRating } from "@/components/StarRating";
+import { getRatingFor } from "@/lib/reviews";
 import {
   PdpBreadcrumb,
   PdpAccordion,
@@ -44,6 +46,7 @@ export default async function ProductPage({ params }: PageProps<"/producto/[slug
   const related = getRelatedProducts(product);
   const ownCollection = getAllCollections().find((c) => c.productIds.includes(product.id));
   const ownLook = getAllLooks().find((l) => l.hotspots.some((h) => h.productId === product.id));
+  const rating = getRatingFor(product.id);
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -56,6 +59,10 @@ export default async function ProductPage({ params }: PageProps<"/producto/[slug
       priceCurrency: "EUR",
       availability: product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
     },
+    // Solo se declara si el producto tiene valoraciones DEMO reales en
+    // lib/reviews.ts (nunca una cifra inventada al vuelo) — mismos números
+    // ya visibles en la propia página, no un dato oculto distinto.
+    ...(rating ? { aggregateRating: { "@type": "AggregateRating", ratingValue: rating.rating, reviewCount: rating.count } } : {}),
   };
 
   return (
@@ -75,6 +82,15 @@ export default async function ProductPage({ params }: PageProps<"/producto/[slug
           </div>
           <span className="text-xs font-bold uppercase tracking-widest text-terracotta">{CATEGORY_LABELS[product.category]}</span>
           <h1 className="font-display text-3xl font-semibold sm:text-4xl">{product.name}</h1>
+          {rating && (
+            <div className="flex items-center gap-1.5 text-sm text-ink-soft">
+              <StarRating rating={rating.rating} />
+              <span className="font-semibold text-ink">{rating.rating}</span>
+              <span>
+                ({rating.count} reseñas <span className="text-xs">· demo</span>)
+              </span>
+            </div>
+          )}
           <Price price={product.price} compareAtPrice={product.compareAtPrice} />
           <p className="text-ink-soft">{product.description}</p>
 

@@ -49,6 +49,8 @@ export interface DemoOrder {
   createdAt: string;
   items: Array<{ productId: string; name: string; quantity: number; price: number }>;
   total: number;
+  /** 0 si el subtotal alcanzó el umbral de envío gratis (ver lib/shipping.ts). */
+  shippingCost: number;
   address: Address;
   email: string;
   status: "recibido";
