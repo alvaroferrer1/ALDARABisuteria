@@ -1,9 +1,12 @@
 import { NextResponse } from "next/server";
 import { readJson, writeJson } from "@/lib/localDb";
 import { getEventBySlug } from "@/lib/events";
+import { checkRateLimit, ipKeyFrom, rateLimitedResponse } from "@/lib/rateLimit";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const FILE = "event-rsvps.json";
+const LIMIT = 8;
+const WINDOW_MS = 10 * 60 * 1000;
 
 interface EventRsvp {
   eventSlug: string;
@@ -13,6 +16,9 @@ interface EventRsvp {
 }
 
 export async function POST(request: Request) {
+  const { allowed, retryAfterMs } = checkRateLimit(`event-rsvp:${ipKeyFrom(request)}`, LIMIT, WINDOW_MS);
+  if (!allowed) return rateLimitedResponse(retryAfterMs);
+
   let body: Partial<EventRsvp>;
   try {
     body = await request.json();

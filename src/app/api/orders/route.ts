@@ -7,6 +7,7 @@ import { GIFT_WRAP_PRICE } from "@/lib/giftCards";
 import { readSessionCookieValue, SESSION_COOKIE_NAME } from "@/lib/auth";
 import { getBalance, appendMovement } from "@/lib/clubLedger";
 import { POINTS_PER_EURO_DISCOUNT, pointsToEuros } from "@/lib/club";
+import { recordEvent } from "@/lib/analytics";
 import type { DemoOrder, Address, GiftCard } from "@/lib/types";
 
 const FILE = "orders.json";
@@ -23,6 +24,8 @@ interface OrderRequestBody {
   personalizationNote?: string;
   /** Puntos del Club que el usuario quiere canjear en este pedido (opcional). */
   redeemPoints?: number;
+  /** Id de sesión de analítica local, solo si el usuario aceptó esa cookie (ver lib/trackEvent.ts). */
+  analyticsSessionId?: string;
 }
 
 function isAddress(value: unknown): value is Address {
@@ -141,6 +144,11 @@ export async function POST(request: Request) {
   const orders = await readJson<DemoOrder[]>(FILE, []);
   orders.push(order);
   await writeJson(FILE, orders);
+
+  const analyticsSessionId = typeof body.analyticsSessionId === "string" && /^[a-zA-Z0-9-]{8,64}$/.test(body.analyticsSessionId) ? body.analyticsSessionId : undefined;
+  if (analyticsSessionId) {
+    await recordEvent({ type: "purchase", path: "/checkout", sessionId: analyticsSessionId, ts: order.createdAt, meta: { total: order.total, items: items.length } });
+  }
 
   if (giftCardCode && cardIndex !== -1) {
     cards[cardIndex] = { ...cards[cardIndex], balance: cards[cardIndex].balance - giftCardApplied };

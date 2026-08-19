@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Montserrat } from "next/font/google";
 import "./globals.css";
@@ -14,6 +15,7 @@ import { SearchOverlay } from "@/components/SearchOverlay";
 import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
 import { PageTransition } from "@/components/PageTransition";
 import { CookieConsentBanner } from "@/components/CookieConsentBanner";
+import { AnalyticsTracker } from "@/components/AnalyticsTracker";
 
 // Cormorant Garamond (titulares) + Montserrat (cuerpo/UI) — tipografía exacta
 // de ALDARA_Propuesta_Cliente_FINAL_v2.pdf, Bloque 04 "Tipografía y jerarquía
@@ -119,6 +121,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           </CartProvider>
         </PhotoManifestProvider>
         <ServiceWorkerRegister />
+        <Suspense fallback={null}>
+          <AnalyticsTracker />
+        </Suspense>
       </body>
     </html>
   );

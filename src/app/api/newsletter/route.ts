@@ -1,8 +1,11 @@
 import { NextResponse } from "next/server";
 import { readJson, writeJson } from "@/lib/localDb";
+import { checkRateLimit, ipKeyFrom, rateLimitedResponse } from "@/lib/rateLimit";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const FILE = "newsletter-subscribers.json";
+const LIMIT = 8;
+const WINDOW_MS = 10 * 60 * 1000;
 
 interface Subscriber {
   email: string;
@@ -10,6 +13,9 @@ interface Subscriber {
 }
 
 export async function POST(request: Request) {
+  const { allowed, retryAfterMs } = checkRateLimit(`newsletter:${ipKeyFrom(request)}`, LIMIT, WINDOW_MS);
+  if (!allowed) return rateLimitedResponse(retryAfterMs);
+
   let body: unknown;
   try {
     body = await request.json();

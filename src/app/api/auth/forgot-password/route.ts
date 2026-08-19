@@ -1,9 +1,15 @@
 import { NextResponse } from "next/server";
 import { createPasswordResetToken } from "@/lib/auth";
+import { checkRateLimit, ipKeyFrom, rateLimitedResponse } from "@/lib/rateLimit";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const LIMIT = 5;
+const WINDOW_MS = 15 * 60 * 1000;
 
 export async function POST(request: Request) {
+  const { allowed, retryAfterMs } = checkRateLimit(`forgot-password:${ipKeyFrom(request)}`, LIMIT, WINDOW_MS);
+  if (!allowed) return rateLimitedResponse(retryAfterMs);
+
   let body: unknown;
   try {
     body = await request.json();

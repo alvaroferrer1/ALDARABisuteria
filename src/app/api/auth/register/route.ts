@@ -1,9 +1,15 @@
 import { NextResponse } from "next/server";
 import { createUser, createSessionCookieValue, SESSION_COOKIE_NAME } from "@/lib/auth";
+import { checkRateLimit, ipKeyFrom, rateLimitedResponse } from "@/lib/rateLimit";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const REGISTER_LIMIT = 8;
+const REGISTER_WINDOW_MS = 15 * 60 * 1000;
 
 export async function POST(request: Request) {
+  const { allowed, retryAfterMs } = checkRateLimit(`register:${ipKeyFrom(request)}`, REGISTER_LIMIT, REGISTER_WINDOW_MS);
+  if (!allowed) return rateLimitedResponse(retryAfterMs);
+
   let body: { email?: string; name?: string; password?: string };
   try {
     body = await request.json();

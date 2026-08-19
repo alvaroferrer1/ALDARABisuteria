@@ -9,6 +9,7 @@ import { money } from "@/lib/storage";
 import { useTranslations } from "@/lib/i18n/localeStore";
 import { POINTS_PER_EURO_DISCOUNT, pointsToEuros } from "@/lib/club";
 import { activePaymentProvider } from "@/lib/payment";
+import { trackEvent, getAnalyticsSessionIdIfConsented } from "@/lib/trackEvent";
 
 type PaymentMethodId = "tarjeta" | "paypal" | "bizum";
 
@@ -64,6 +65,14 @@ export default function CheckoutPage() {
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => setPointsBalance(data?.balance ?? null))
       .catch(() => setPointsBalance(null));
+  }, []);
+
+  // Un único begin_checkout por visita al checkout, no uno por cada paso —
+  // el embudo mide "llegó al checkout", los 3 pasos internos son UI, no
+  // eventos de embudo aparte.
+  useEffect(() => {
+    trackEvent("begin_checkout", "/checkout", { items: lines.length });
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- solo al montar, no en cada cambio de cesta
   }, []);
 
   async function applyGiftCard() {
@@ -125,6 +134,7 @@ export default function CheckoutPage() {
       ...(giftWrap ? { giftWrap: true } : {}),
       ...(giftMessage.trim() ? { giftMessage: giftMessage.trim() } : {}),
       ...(personalizationNote.trim() ? { personalizationNote: personalizationNote.trim() } : {}),
+      ...(getAnalyticsSessionIdIfConsented() ? { analyticsSessionId: getAnalyticsSessionIdIfConsented() } : {}),
     };
     try {
       const res = await fetch("/api/orders", {

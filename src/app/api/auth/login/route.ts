@@ -1,7 +1,16 @@
 import { NextResponse } from "next/server";
 import { verifyUser, createSessionCookieValue, SESSION_COOKIE_NAME } from "@/lib/auth";
+import { checkRateLimit, ipKeyFrom, rateLimitedResponse } from "@/lib/rateLimit";
+
+// Freno a fuerza bruta por IP — antes no había ningún límite en /login,
+// gap real: un script podía probar contraseñas sin restricción.
+const LOGIN_LIMIT = 10;
+const LOGIN_WINDOW_MS = 5 * 60 * 1000;
 
 export async function POST(request: Request) {
+  const { allowed, retryAfterMs } = checkRateLimit(`login:${ipKeyFrom(request)}`, LOGIN_LIMIT, LOGIN_WINDOW_MS);
+  if (!allowed) return rateLimitedResponse(retryAfterMs);
+
   let body: { email?: string; password?: string; remember?: boolean };
   try {
     body = await request.json();

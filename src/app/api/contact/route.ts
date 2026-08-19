@@ -1,8 +1,11 @@
 import { NextResponse } from "next/server";
 import { readJson, writeJson } from "@/lib/localDb";
+import { checkRateLimit, ipKeyFrom, rateLimitedResponse } from "@/lib/rateLimit";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const FILE = "contact-messages.json";
+const LIMIT = 5;
+const WINDOW_MS = 10 * 60 * 1000;
 
 interface ContactMessage {
   name: string;
@@ -14,6 +17,9 @@ interface ContactMessage {
 }
 
 export async function POST(request: Request) {
+  const { allowed, retryAfterMs } = checkRateLimit(`contact:${ipKeyFrom(request)}`, LIMIT, WINDOW_MS);
+  if (!allowed) return rateLimitedResponse(retryAfterMs);
+
   let body: Partial<ContactMessage>;
   try {
     body = await request.json();

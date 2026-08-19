@@ -4,6 +4,7 @@ import { createContext, useContext, useMemo, useState, useSyncExternalStore, typ
 import { PRODUCTS } from "@/lib/products";
 import { createLocalStorageStore } from "@/lib/store";
 import { GIFT_WRAP_PRICE } from "@/lib/giftCards";
+import { trackEvent } from "@/lib/trackEvent";
 import type { CartLine } from "@/lib/types";
 
 const CART_KEY = "aldara_cart_v1";
@@ -83,6 +84,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     // Ámbar en stock 0 para construir Back in Stock — antes nada lo impedía.
     const product = PRODUCTS.find((p) => p.id === productId);
     if (!product || product.stock === 0) return;
+    trackEvent("add_to_cart", typeof window !== "undefined" ? window.location.pathname : "", { productId, category: product.category });
     cartStore.setValue((prev) => {
       const existing = prev.find((l) => l.productId === productId);
       if (existing) {

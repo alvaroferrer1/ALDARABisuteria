@@ -2,10 +2,17 @@ import { NextResponse } from "next/server";
 import { readJson, writeJson } from "@/lib/localDb";
 import { generateGiftCardCode, GIFT_CARD_AMOUNTS } from "@/lib/giftCards";
 import { sendEmail } from "@/lib/email";
+import { checkRateLimit, ipKeyFrom, rateLimitedResponse } from "@/lib/rateLimit";
 import type { GiftCard } from "@/lib/types";
 
 const FILE = "gift-cards.json";
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const CREATE_LIMIT = 6;
+const CREATE_WINDOW_MS = 15 * 60 * 1000;
+// Límite más estricto en la consulta por código: es la ruta que un script
+// usaría para probar códigos al azar y encontrar uno con saldo real.
+const LOOKUP_LIMIT = 15;
+const LOOKUP_WINDOW_MS = 5 * 60 * 1000;
 
 /**
  * Compra de tarjeta regalo — DEMO: crea un código real y un saldo real
@@ -14,6 +21,9 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
  * /api/orders POST), no es solo decorativo.
  */
 export async function POST(request: Request) {
+  const { allowed, retryAfterMs } = checkRateLimit(`gift-cards:create:${ipKeyFrom(request)}`, CREATE_LIMIT, CREATE_WINDOW_MS);
+  if (!allowed) return rateLimitedResponse(retryAfterMs);
+
   let body: { amount?: number; buyerEmail?: string; recipientName?: string; recipientEmail?: string; message?: string };
   try {
     body = await request.json();
@@ -62,6 +72,9 @@ export async function POST(request: Request) {
 
 /** Consultar saldo de un código real — GET /api/gift-cards?code=ALDR-XXXX-XXXX */
 export async function GET(request: Request) {
+  const { allowed, retryAfterMs } = checkRateLimit(`gift-cards:lookup:${ipKeyFrom(request)}`, LOOKUP_LIMIT, LOOKUP_WINDOW_MS);
+  if (!allowed) return rateLimitedResponse(retryAfterMs);
+
   const code = new URL(request.url).searchParams.get("code")?.trim().toUpperCase();
   if (!code) return NextResponse.json({ error: "Falta el código." }, { status: 400 });
 
