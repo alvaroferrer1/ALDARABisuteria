@@ -105,11 +105,16 @@ export default async function ShopPage({ searchParams }: PageProps<"/shop">) {
             {products.length === 0 ? (
               <p className="py-16 text-center text-ink-soft">No encontramos piezas con esa búsqueda. Prueba con otra palabra.</p>
             ) : (
-              <div className="grid gap-7 sm:grid-cols-2 xl:grid-cols-3">
-                {products.map((product) => (
-                  <ProductCard key={product.id} product={product} />
-                ))}
-              </div>
+              <>
+                <p className="mb-5 text-sm text-ink-soft">
+                  {products.length} {products.length === 1 ? "pieza" : "piezas"}
+                </p>
+                <div className="grid gap-7 sm:grid-cols-2 xl:grid-cols-3">
+                  {products.map((product) => (
+                    <ProductCard key={product.id} product={product} />
+                  ))}
+                </div>
+              </>
             )}
           </div>
         </div>

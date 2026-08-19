@@ -38,5 +38,15 @@
     "date": "",
     "productName": "",
     "createdAt": "2026-08-19T08:01:26.776Z"
+  },
+  {
+    "token": "RuzP0qLey_ZQKP_1MBjSLA",
+    "recipientName": "Ana E2E",
+    "message": "Feliz cumpleaños de prueba E2E.",
+    "occasion": "Cumpleaños",
+    "place": "",
+    "date": "",
+    "productName": "",
+    "createdAt": "2026-08-19T08:18:01.203Z"
   }
 ]

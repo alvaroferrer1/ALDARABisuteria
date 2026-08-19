@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useTranslations } from "@/lib/i18n/localeStore";
+import { useCart } from "@/context/CartContext";
 import { money } from "@/lib/storage";
 import type { DemoOrder } from "@/lib/types";
 
@@ -35,6 +36,16 @@ export function AccountGreeting({ userName, memberSinceISO }: { userName: string
 
 export function AccountHub({ orders }: { orders: DemoOrder[] }) {
   const { t } = useTranslations();
+  const { addItem } = useCart();
+
+  // "Volver a comprar" (POST_AUDIT_IMPROVEMENTS.md, bloque S): añade a la
+  // cesta todas las piezas de un pedido anterior con un clic — no navega,
+  // se queda en la propia página para que se note el añadido.
+  function reorder(order: DemoOrder, e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    for (const item of order.items) addItem(item.productId, item.quantity);
+  }
 
   const SPACE_LINKS = [
     { href: "/account/jewelry-box", label: t.account.jewelryBox, sub: t.account.jewelryBoxSub, icon: "M12 3l3 6 6 1-4.5 4 1 6-5.5-3-5.5 3 1-6L3 10l6-1Z" },
@@ -98,7 +109,16 @@ export function AccountHub({ orders }: { orders: DemoOrder[] }) {
                   </div>
                   <p className="mt-1 text-xs text-ink-soft">{new Date(order.createdAt).toLocaleDateString("es-ES")}</p>
                   <p className="mt-2 text-sm text-ink-soft">{order.items.map((i) => `${i.quantity}x ${i.name}`).join(", ")}</p>
-                  <p className="mt-2 font-semibold">{money(order.total)}</p>
+                  <div className="mt-2 flex items-center justify-between gap-3">
+                    <p className="font-semibold">{money(order.total)}</p>
+                    <button
+                      type="button"
+                      onClick={(e) => reorder(order, e)}
+                      className="rounded-full border border-line px-4 py-1.5 text-xs font-semibold hover:border-terracotta hover:text-terracotta"
+                    >
+                      Volver a comprar
+                    </button>
+                  </div>
                 </Link>
               </li>
             ))}

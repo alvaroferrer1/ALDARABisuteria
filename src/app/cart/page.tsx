@@ -2,15 +2,17 @@
 
 import Link from "next/link";
 import { useCart } from "@/context/CartContext";
+import { useWishlist } from "@/context/WishlistContext";
 import { PRODUCTS } from "@/lib/products";
 import { money } from "@/lib/storage";
-import { ProductVisual } from "@/components/ProductVisual";
+import { ProductPlate } from "@/components/ProductPlate";
 import { ProductCard } from "@/components/ProductCard";
 import { FreeShippingProgress } from "@/components/FreeShippingProgress";
 import { whatsappHref } from "@/lib/whatsapp";
 
 export default function CartPage() {
   const { lines, removeItem, setQuantity, totalPrice } = useCart();
+  const { toggle: toggleWishlist } = useWishlist();
   const inCartIds = new Set(lines.map((l) => l.productId));
   const crossSell = PRODUCTS.filter((p) => !inCartIds.has(p.id) && p.stock > 0).slice(0, 4);
 
@@ -44,8 +46,8 @@ export default function CartPage() {
               if (!product) return null;
               return (
                 <li key={line.productId} className="flex gap-4 py-5">
-                  <Link href={`/producto/${product.slug}`} className="flex h-20 w-20 flex-shrink-0 items-center justify-center rounded-xl bg-surface-2">
-                    <ProductVisual product={product} size={44} />
+                  <Link href={`/producto/${product.slug}`} className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-surface-2">
+                    <ProductPlate product={product} className="rounded-xl" iconSize={44} />
                   </Link>
                   <div className="flex-1">
                     <Link href={`/producto/${product.slug}`} className="font-semibold">
@@ -62,7 +64,16 @@ export default function CartPage() {
                       <button onClick={() => setQuantity(line.productId, line.quantity + 1)} aria-label="Sumar unidad" className="h-7 w-7 rounded-full border border-line">
                         +
                       </button>
-                      <button onClick={() => removeItem(line.productId)} className="ml-4 text-xs text-terracotta underline">
+                      <button
+                        onClick={() => {
+                          toggleWishlist(line.productId);
+                          removeItem(line.productId);
+                        }}
+                        className="ml-4 text-xs text-ink-soft underline"
+                      >
+                        Guardar para más tarde
+                      </button>
+                      <button onClick={() => removeItem(line.productId)} className="ml-2 text-xs text-terracotta underline">
                         Quitar
                       </button>
                     </div>
