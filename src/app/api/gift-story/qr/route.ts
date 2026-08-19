@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
 import QRCode from "qrcode";
+import { checkRateLimit, ipKeyFrom, rateLimitedResponse } from "@/lib/rateLimit";
+
+const LIMIT = 30;
+const WINDOW_MS = 60 * 1000;
 
 /**
  * Genera un QR SVG real (librería `qrcode`, mantenida, sin llamadas a
@@ -11,6 +15,9 @@ import QRCode from "qrcode";
 const ALLOWED_PATH_PATTERNS = [/^\/gift-story\/[A-Za-z0-9_-]+$/, /^\/account\/passports\/[A-Za-z0-9_-]+$/];
 
 export async function GET(request: Request) {
+  const { allowed, retryAfterMs } = checkRateLimit(`gift-story-qr:${ipKeyFrom(request)}`, LIMIT, WINDOW_MS);
+  if (!allowed) return rateLimitedResponse(retryAfterMs);
+
   const { searchParams, origin } = new URL(request.url);
   const target = searchParams.get("url") || "";
 

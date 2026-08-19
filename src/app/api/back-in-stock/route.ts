@@ -2,9 +2,12 @@ import { NextResponse } from "next/server";
 import { randomUUID } from "node:crypto";
 import { readJson, writeJson } from "@/lib/localDb";
 import { getProductById } from "@/lib/products";
+import { checkRateLimit, ipKeyFrom, rateLimitedResponse } from "@/lib/rateLimit";
 
 const FILE = "back-in-stock-requests.json";
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const LIMIT = 15;
+const WINDOW_MS = 10 * 60 * 1000;
 
 export interface BackInStockRequest {
   id: string;
@@ -16,6 +19,9 @@ export interface BackInStockRequest {
 }
 
 export async function POST(request: Request) {
+  const { allowed, retryAfterMs } = checkRateLimit(`back-in-stock:${ipKeyFrom(request)}`, LIMIT, WINDOW_MS);
+  if (!allowed) return rateLimitedResponse(retryAfterMs);
+
   let body: { productId?: string; email?: string };
   try {
     body = await request.json();

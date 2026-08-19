@@ -1,10 +1,16 @@
 import { NextResponse } from "next/server";
 import { readJson, writeJson } from "@/lib/localDb";
 import { createToken, type GiftStory } from "@/lib/giftStory";
+import { checkRateLimit, ipKeyFrom, rateLimitedResponse } from "@/lib/rateLimit";
 
 const FILE = "gift-stories.json";
+const LIMIT = 10;
+const WINDOW_MS = 10 * 60 * 1000;
 
 export async function POST(request: Request) {
+  const { allowed, retryAfterMs } = checkRateLimit(`gift-story:${ipKeyFrom(request)}`, LIMIT, WINDOW_MS);
+  if (!allowed) return rateLimitedResponse(retryAfterMs);
+
   const body = await request.json().catch(() => null);
   const message = typeof body?.message === "string" ? body.message.trim() : "";
   const occasion = typeof body?.occasion === "string" ? body.occasion.trim() : "";
