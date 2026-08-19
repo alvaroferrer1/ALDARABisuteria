@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ProductVisual } from "./ProductVisual";
+import { ProductPlate } from "./ProductPlate";
 import { PhotoSlot } from "./PhotoSlot";
 import { useTranslations } from "@/lib/i18n/localeStore";
 import { CATEGORY_LABELS } from "@/lib/products";
@@ -27,10 +27,8 @@ export function DropsContent({ news, limited }: { news: Product[]; limited: Prod
       ) : (
         <div className="mb-10 grid gap-6 sm:grid-cols-3">
           {news.map((p) => (
-            <Link key={p.id} href={`/producto/${p.slug}`} className="group rounded-2xl border border-line p-5">
-              <div className="mb-4 flex h-24 items-center justify-center rounded-xl bg-surface-2">
-                <ProductVisual product={p} size={48} />
-              </div>
+            <Link key={p.id} href={`/producto/${p.slug}`} className="group overflow-hidden rounded-2xl border border-line p-5">
+              <ProductPlate product={p} className="mb-4 aspect-square rounded-xl transition-transform group-hover:scale-105" />
               <span className="text-xs font-bold uppercase text-terracotta">{CATEGORY_LABELS[p.category]}</span>
               <p className="font-semibold">{p.name}</p>
               <p className="text-sm text-ink-soft">{money(p.price)}</p>
@@ -45,10 +43,8 @@ export function DropsContent({ news, limited }: { news: Product[]; limited: Prod
       ) : (
         <div className="grid gap-6 sm:grid-cols-3">
           {limited.map((p) => (
-            <Link key={p.id} href={`/producto/${p.slug}`} className="group rounded-2xl border border-line p-5">
-              <div className="mb-4 flex h-24 items-center justify-center rounded-xl bg-surface-2">
-                <ProductVisual product={p} size={48} />
-              </div>
+            <Link key={p.id} href={`/producto/${p.slug}`} className="group overflow-hidden rounded-2xl border border-line p-5">
+              <ProductPlate product={p} className="mb-4 aspect-square rounded-xl transition-transform group-hover:scale-105" />
               <span className="text-xs font-bold uppercase text-terracotta">{CATEGORY_LABELS[p.category]}</span>
               <p className="font-semibold">{p.name}</p>
               <p className="text-sm text-ink-soft">{money(p.price)}</p>
