@@ -82,6 +82,19 @@ export async function changePassword(email: string, currentPassword: string, new
   });
 }
 
+// Bug real corregido: no había ninguna forma de editar tu nombre después de
+// registrarte — el "perfil" de la cuenta era de solo lectura por completo.
+export async function updateUserName(email: string, newName: string): Promise<PublicUser> {
+  return withFileLock(USERS_FILE, async () => {
+    const users = await getUsers();
+    const idx = users.findIndex((u) => u.email.toLowerCase() === email.toLowerCase());
+    if (idx === -1) throw new Error("Cuenta no encontrada.");
+    users[idx] = { ...users[idx], name: newName };
+    await writeJson(USERS_FILE, users);
+    return { email: users[idx].email, name: users[idx].name };
+  });
+}
+
 export interface PasswordResetToken {
   email: string;
   tokenHash: string;

@@ -7,6 +7,7 @@ import { money } from "@/lib/storage";
 import { useTranslations } from "@/lib/i18n/localeStore";
 import { GiftCardVisual } from "@/components/GiftCardVisual";
 import { PhotoSlot } from "@/components/PhotoSlot";
+import { GiftCardBalanceCheck } from "@/components/GiftCardBalanceCheck";
 
 /**
  * DEMO: crea un código y saldo reales (persistidos en gift-cards.json),
@@ -93,7 +94,25 @@ export default function GiftCardsPage() {
       </div>
       <p className="mb-2 text-xs font-bold uppercase tracking-widest text-terracotta">{m.giftCardsEyebrow}</p>
       <h1 className="mb-2 font-display text-3xl font-semibold sm:text-4xl">{m.giftCardsTitle}</h1>
-      <p className="mb-8 text-ink-soft">{m.giftCardsSubtitle}</p>
+      <p className="mb-6 text-ink-soft">{m.giftCardsSubtitle}</p>
+
+      {/* Fila de garantías — antes la página pasaba directamente del
+          subtítulo al formulario, sin ninguna razón adicional para
+          comprar, gap real detectado al revisar la página vacía. */}
+      <div className="mb-8 grid grid-cols-3 gap-3 rounded-2xl bg-surface-2 p-4 text-center text-xs">
+        <div>
+          <p className="font-semibold">Código real</p>
+          <p className="text-ink-soft">Se canjea de verdad en el checkout</p>
+        </div>
+        <div>
+          <p className="font-semibold">Sin caducidad</p>
+          <p className="text-ink-soft">El saldo no expira</p>
+        </div>
+        <div>
+          <p className="font-semibold">Envío inmediato</p>
+          <p className="text-ink-soft">Al destinatario, si lo indicas</p>
+        </div>
+      </div>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-5">
         <div>
@@ -133,6 +152,10 @@ export default function GiftCardsPage() {
           {status === "loading" ? m.giftCardsCreating : `${m.giftCardsBuyButton} ${money(amount)}`}
         </button>
       </form>
+
+      <div className="mt-10">
+        <GiftCardBalanceCheck />
+      </div>
     </section>
   );
 }

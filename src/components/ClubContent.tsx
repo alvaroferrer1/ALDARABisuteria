@@ -131,6 +131,28 @@ export function ClubContent({
         </div>
       )}
 
+      {/* "Cómo funciona" + ejemplo calculado — antes la página pasaba
+          directamente del hero a la lista de niveles sin explicar el
+          mecanismo con un caso real, gap real detectado al revisar la
+          página sin sesión iniciada (donde se nota más vacía). */}
+      <h2 className="mt-12 mb-4 text-sm font-semibold uppercase tracking-wide text-ink-soft">{m.clubHowTitle}</h2>
+      <div className="grid gap-4 sm:grid-cols-3">
+        {[
+          [m.clubHowStep1, m.clubHowStep1Sub],
+          [m.clubHowStep2, m.clubHowStep2Sub],
+          [m.clubHowStep3, m.clubHowStep3Sub],
+        ].map(([title, sub], i) => (
+          <div key={title} className="rounded-2xl border border-line p-5">
+            <span className="mb-2 flex h-8 w-8 items-center justify-center rounded-full bg-surface-2 font-display text-sm font-semibold">{i + 1}</span>
+            <p className="font-semibold">{title}</p>
+            <p className="mt-1 text-sm text-ink-soft">{sub}</p>
+          </div>
+        ))}
+      </div>
+      <div className="mt-4 rounded-2xl bg-surface-2 p-5 text-sm text-ink-soft">
+        <span className="font-semibold text-ink">{m.clubExampleTitle}</span> {m.clubExampleText}
+      </div>
+
       <h2 className="mt-12 mb-4 text-sm font-semibold uppercase tracking-wide text-ink-soft">{m.clubLevelsTitle}</h2>
       <ul className="flex flex-col gap-3">
         {TIERS.map((tr) => {

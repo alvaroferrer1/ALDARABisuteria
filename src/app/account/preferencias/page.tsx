@@ -5,6 +5,7 @@ import { readSessionCookieValue, SESSION_COOKIE_NAME } from "@/lib/auth";
 import { readJson } from "@/lib/localDb";
 import { NewsletterPreferenceToggle } from "@/components/NewsletterPreferenceToggle";
 import { LanguagePreferenceSwitcher } from "@/components/LanguagePreferenceSwitcher";
+import { AppearancePreferenceToggle } from "@/components/AppearancePreferenceToggle";
 import { PreferencesChrome } from "@/components/AccountMoreChrome";
 
 export const metadata: Metadata = { title: "Mis preferencias", robots: { index: false, follow: true } };
@@ -22,6 +23,7 @@ export default async function PreferencesPage() {
       <PreferencesChrome
         newsletterToggle={<NewsletterPreferenceToggle email={user.email} initiallySubscribed={subscribed} />}
         languageSwitcher={<LanguagePreferenceSwitcher />}
+        appearanceToggle={<AppearancePreferenceToggle />}
       />
     </section>
   );

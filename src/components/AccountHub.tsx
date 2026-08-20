@@ -48,6 +48,12 @@ export function AccountHub({ orders }: { orders: DemoOrder[] }) {
   }
 
   const SPACE_LINKS = [
+    {
+      href: "/account/perfil",
+      label: t.account.profile,
+      sub: t.account.profileSub,
+      icon: "M12 12a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9Zm0 2c-4.4 0-8 2.24-8 5v1a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-1c0-2.76-3.6-5-8-5Z",
+    },
     { href: "/account/jewelry-box", label: t.account.jewelryBox, sub: t.account.jewelryBoxSub, icon: "M12 3l3 6 6 1-4.5 4 1 6-5.5-3-5.5 3 1-6L3 10l6-1Z" },
     { href: "/wishlist", label: t.account.wishlist, sub: t.account.wishlistSub, icon: "M12 21s-7.5-4.6-10-9.3C.4 8.3 2.1 5 5.6 5c2 0 3.4 1 4.4 2.4C11 6 12.4 5 14.4 5c3.5 0 5.2 3.3 3.6 6.7C19.5 16.4 12 21 12 21Z" },
     { href: "/club", label: t.account.club, sub: t.account.clubSub, icon: "M12 2 3 7v6c0 5 4 8 9 9 5-1 9-4 9-9V7l-9-5Z" },

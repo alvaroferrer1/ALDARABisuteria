@@ -6,9 +6,11 @@ import { useTranslations } from "@/lib/i18n/localeStore";
 export function PreferencesChrome({
   newsletterToggle,
   languageSwitcher,
+  appearanceToggle,
 }: {
   newsletterToggle: React.ReactNode;
   languageSwitcher: React.ReactNode;
+  appearanceToggle: React.ReactNode;
 }) {
   const { t } = useTranslations();
   return (
@@ -40,6 +42,7 @@ export function PreferencesChrome({
           <p className="font-semibold">{t.accountMore.appearanceTitle}</p>
           <p className="text-sm text-ink-soft">{t.accountMore.appearanceBody}</p>
         </div>
+        {appearanceToggle}
       </div>
     </>
   );
